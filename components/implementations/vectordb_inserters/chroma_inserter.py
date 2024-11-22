@@ -1,9 +1,15 @@
 from components.interfaces.all_interfaces import VectorInserter
 
+import os
 import chromadb
 import logging
 from typing import List, Tuple
-from langchain_openai import OpenAIEmbeddings
+import chromadb.utils.embedding_functions as embedding_functions
+
+# to avoid messing with a python image that does not have the required sqlite
+# __import__('pysqlite3')
+# import sys
+# sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 
 class ChromaDBRemoteInserter(VectorInserter):
@@ -17,27 +23,38 @@ class ChromaDBRemoteInserter(VectorInserter):
     ) -> None:
 
         self.url = url
-        self.port = port
-        self.tenant=tenant
-        self.database=database
-        self.collection=collection
-        self.embedding_function: chromadb.EmbeddingFunction = OpenAIEmbeddings(model=embedding_model)
-        self.chroma_client: chromadb.ClientAPI = chromadb.HttpClient(
-            host=self.host, 
-            port=self.port,
-            tenant=self.tenant,
-            database=self.database
-            )
-
+        self.port= port
+        self.tenant= tenant
+        self.database= database
+        self.collection= collection
+        self.embedding_model= embedding_model
+    
         self.logger = logging.getLogger('Inserter')
 
     def insert(self, vectors: List[List[float]]) -> None:
 
         self.logger.info("Starting Inserting process to ChromaDB")
-        self.logger.info(f"Received {len(vectors)} vectors")
-        self.logger.info(f"Chroma connection: {self.url}:{self.port}, tenant: {self.tenant}, database: {self.database}")
-        self.logger.info(f"Will use {str(self.embedding_fmodel)} embedding model")
+        self.logger.info(f"Inserter received {len(vectors)} vectors")
+        self.logger.info(f"Will use {str(self.embedding_model)} embedding model")
+        self.logger.info(f"Initiating chroma connection at {self.url}:{self.port}, tenant: {self.tenant}, database: {self.database}")
 
+
+        openai_ef = embedding_functions.OpenAIEmbeddingFunction(
+                        api_key=os.getenv("OPENAI_API_KEY"),
+                        model_name=self.embedding_model
+                    )
+
+        try:
+            self.chroma_client: chromadb.ClientAPI = chromadb.HttpClient(
+                host=self.url,
+                port=self.port
+                )
+        except ValueError as e:
+            self.logger.error(f"{e}")
+            os._exit(100)
+
+
+        self.logger.info("Trying to get collections")
         collections = self.chroma_client.list_collections()
         if len(collections) > 0:
             self.logger.info(f"Collections found: {collections}")
@@ -46,8 +63,10 @@ class ChromaDBRemoteInserter(VectorInserter):
 
         collection = self.chroma_client.get_or_create_collection(
             name = self.collection,
-            embedding_function = self.embedding_function
+            embedding_function = openai_ef
             )
+        
+        self.logger.info(f"Collection {self.collection} found")
 
     
 

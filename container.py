@@ -44,5 +44,6 @@ class Container(containers.DeclarativeContainer):
         'components.services.vector_indexer.VectorIndexer',
         document_loader=document_loader,
         document_splitter=document_splitter,
-        embedder=embedder
+        embedder=embedder,
+        vector_inserter=vector_inserter
     )
