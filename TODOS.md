@@ -4,3 +4,4 @@
 - I think the factories should be changed to singletons - ask openai & how to pass vars
 - splitter logging
 - fix exponential backoff for embedder
+- https://github.com/chroma-core/chroma/pkgs/container/chroma

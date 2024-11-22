@@ -41,6 +41,6 @@ class VectorIndexer:
         assert number_of_vectors_generated is not None and number_of_vectors_generated != 0
 
         self.logger.info("BEGIN INSERTING")
-        self.vector_inserter.insert(embeddings)
+        self.vector_inserter.insert(vectors=embeddings, documents=split_documents)
         
         self.logger.info("END")

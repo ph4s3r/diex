@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, Any
+from typing import List, Optional
 
 from langchain_core.documents import Document
 
@@ -28,5 +28,5 @@ class Embedder(ABC):
 class VectorInserter(ABC):
     @abstractmethod
     # insert vector embeddings to a vector database
-    def insert(self, Vectors: List[List[float]]) -> None:
+    def insert(self, documents: List[Document], vectors: Optional[List[List[float]]])-> None:
         pass

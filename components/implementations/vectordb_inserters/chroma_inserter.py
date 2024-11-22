@@ -1,9 +1,11 @@
 from components.interfaces.all_interfaces import VectorInserter
 
 import os
-import chromadb
 import logging
-from typing import List, Tuple
+import chromadb
+from uuid import uuid4
+from typing import List, Optional
+from langchain_core.documents import Document
 import chromadb.utils.embedding_functions as embedding_functions
 
 # to avoid messing with a python image that does not have the required sqlite
@@ -31,13 +33,12 @@ class ChromaDBRemoteInserter(VectorInserter):
     
         self.logger = logging.getLogger('Inserter')
 
-    def insert(self, vectors: List[List[float]]) -> None:
+    def insert(self, documents: List[Document], vectors: Optional[List[List[float]]] = None) -> None:
 
         self.logger.info("Starting Inserting process to ChromaDB")
         self.logger.info(f"Inserter received {len(vectors)} vectors")
         self.logger.info(f"Will use {str(self.embedding_model)} embedding model")
         self.logger.info(f"Initiating chroma connection at {self.url}:{self.port}, tenant: {self.tenant}, database: {self.database}")
-
 
         openai_ef = embedding_functions.OpenAIEmbeddingFunction(
                         api_key=os.getenv("OPENAI_API_KEY"),
@@ -55,7 +56,7 @@ class ChromaDBRemoteInserter(VectorInserter):
 
 
         self.logger.info("Trying to get collections")
-        collections = self.chroma_client.list_collections()
+        collections: os.Sequence[chromadb.Collection] = self.chroma_client.list_collections()
         if len(collections) > 0:
             self.logger.info(f"Collections found: {collections}")
         else:
@@ -68,7 +69,29 @@ class ChromaDBRemoteInserter(VectorInserter):
         
         self.logger.info(f"Collection {self.collection} found")
 
-    
+        uuids = [str(uuid4()) for _ in range(len(documents))]
+
+        # can pass raw documents as well...
+        if vectors is None:
+            self.logger.info("Trying to add documents to the collection")
+            collection.add(
+                documents=documents,
+                ids=uuids
+            )
+        else:
+            self.logger.info("Trying to add the vectors and documents to the collection")
+            metadatas = [document.metadata for document in documents]
+            collection.add(
+                documents=documents,
+                embeddings=vectors,
+                metadatas=metadatas,
+                ids=uuids
+            )
+
+
+
+
+
 
     # def list_indexed_documents(self) -> List[Tuple[dict, str]]:
     #     """
