@@ -1,0 +1,7 @@
+# latest stable releases at the time of writing
+dependency_injector==4.43.0
+langchain_openai==0.2.9
+langchain_core==0.3.19
+langchain_community==0.3.7
+unstructured==0.11.8
+markdown==3.7

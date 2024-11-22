@@ -1,0 +1,26 @@
+file_type: markdown         # options: markdown, pdf, txt
+embedding_type: openai      # options: openai, other_embedding_service
+upload_type: local          # options: local, remote
+
+splitter:
+  chunk_size: 750
+  chunk_overlap: 100
+  headers_to_split_on:
+    - ["#", "Header 1"]
+    - ["##", "Header 2"]
+    - ["###", "Header 3"]
+
+embeddings_provider:
+  openai:
+    api_key: YOUR_API_KEY
+    model: "text-embedding-ada-002"
+  other_embedding_service:
+    api_key: YOUR_OTHER_API_KEY
+    model: "other-model"
+
+vector_uploader:
+  local:
+    endpoint: "http://localhost:8000"
+  remote:
+    endpoint: "https://api.remote-vectordb.com"
+    auth_token: "YOUR_AUTH_TOKEN"
