@@ -1,5 +1,6 @@
 from components.interfaces.all_interfaces import DocumentLoader
 
+import logging
 from typing import List
 from pathlib import Path
 from langchain_core.documents import Document
@@ -7,6 +8,9 @@ from langchain_community.document_loaders import UnstructuredMarkdownLoader
 
 
 class MarkdownLoader(DocumentLoader):
+
+    def __init__(self):
+            self.logger = logging.getLogger('MarkdownLoader')
 
     def load(self, file_path: Path) -> List[Document]:
         """Loads Markdown files from the path and returns them as a list of langchain_core.documents.base.Document type
@@ -22,7 +26,7 @@ class MarkdownLoader(DocumentLoader):
             docs = loader.load()
 
             if not docs:
-                print(f"Warning: No content loaded from {str(file_path)}")
+                self.logger.warning(f"Warning: No content loaded from {str(file_path)}")
                 return []
 
             for doc in docs:
@@ -33,5 +37,5 @@ class MarkdownLoader(DocumentLoader):
             return docs
 
         except Exception as e:
-            print(f"Error loading {str(file_path)}: {e}")
+            self.logger.error(f"Error loading {str(file_path)}: {e}")
             return []
