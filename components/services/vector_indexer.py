@@ -4,14 +4,6 @@ from components.interfaces.all_interfaces import DocumentSplitter
 from components.interfaces.all_interfaces import Embedder
 from components.interfaces.all_interfaces import VectorInserter
 
-logging.basicConfig(
-    level=logging.INFO,  # logging levels: DEBUG, INFO, WARNING, ERROR, CRITICAL
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler()
-    ]
-)
-
 class VectorIndexer:
     def __init__(
         self,
