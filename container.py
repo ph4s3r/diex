@@ -4,16 +4,12 @@ from dependency_injector import containers, providers
 from components.implementations.document_loaders.markdown_loader import MarkdownLoader
 from components.implementations.document_loaders.pdf_loader import PDFLoader
 from components.implementations.document_splitters.splitter import MDSplitter
+from components.implementations.embedders.openai_embedder import OpenAIEmbedder
 
 class Container(containers.DeclarativeContainer):
-    
-    config = providers.Configuration(yaml_files=["configs/config.yaml"])
 
-    def load_config(self, config_path: str):
-        with open(config_path, 'r') as file:
-            config_data = yaml.safe_load(file)
-        self.config.from_dict(config_data)
-    
+    config = providers.Configuration()   
+
     document_loader = providers.Selector(
         config.file_type,
         markdown=providers.Factory(MarkdownLoader),
@@ -26,9 +22,16 @@ class Container(containers.DeclarativeContainer):
         chunk_overlap=config.splitter.chunk_overlap,
         headers_to_split_on=config.splitter.headers_to_split_on
     )
+
+    embedder = providers.Factory(
+        OpenAIEmbedder,
+        model=config.embedder.openai.model, 
+        batch_size=config.embedder.openai.batch_size
+    )
     
     vector_indexer_service = providers.Factory(
         'components.services.vector_indexer.VectorIndexer',
         document_loader=document_loader,
-        document_splitter=document_splitter
+        document_splitter=document_splitter,
+        embedder=embedder
     )

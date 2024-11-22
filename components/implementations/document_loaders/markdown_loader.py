@@ -10,7 +10,7 @@ from langchain_community.document_loaders import UnstructuredMarkdownLoader
 class MarkdownLoader(DocumentLoader):
 
     def __init__(self):
-            self.logger = logging.getLogger('MarkdownLoader')
+            self.logger = logging.getLogger('DocumentLoader')
 
     def load(self, file_path: Path) -> List[Document]:
         """Loads Markdown files from the path and returns them as a list of langchain_core.documents.base.Document type
@@ -33,6 +33,7 @@ class MarkdownLoader(DocumentLoader):
                 if doc:
                     # Retain source filename as metadata
                     doc.metadata = {"source": str(file_path)}
+                    self.logger.info(f"markdown file indexed: {str(file_path)}")
 
             return docs
 

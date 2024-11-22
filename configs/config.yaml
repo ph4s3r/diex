@@ -1,10 +1,10 @@
-file_type:        markdown          # options: markdown, pdf, txt
-embedding_type:   openai            # options: openai, other_embedding_service
-upload_type:      local             # options: local, remote
+file_type: markdown # options: markdown, pdf, txt
+embedding_type: openai # options: openai, other_embedding_service
+upload_type: remote # options: local, remote
 
 splitter:
-  chunk_size:     750
-  chunk_overlap:  100
+  chunk_size: 750
+  chunk_overlap: 100
   headers_to_split_on:
     - ["#", "Header 1"]
     - ["##", "Header 2"]
@@ -12,14 +12,13 @@ splitter:
 
 embedder:
   openai:
-    api_key:  y
-    model:    text-embedding-3-small #options: https://platform.openai.com/docs/guides/embeddings/
-    batch_size:  16
+    model: "text-embedding-3-small" #options: https://platform.openai.com/docs/guides/embeddings/
+    batch_size: 16
     rate_limit_config:
-      max_retries:  5
+      max_retries: 5
       initial_delay: 1.0
-      max_delay:    60.0
-      
+      max_delay: 60.0
+
 vector_inserter:
   local:
     endpoint: "http://localhost:8000"

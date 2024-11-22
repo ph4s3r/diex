@@ -1,6 +1,7 @@
 import logging
 from components.interfaces.all_interfaces import DocumentLoader
 from components.interfaces.all_interfaces import DocumentSplitter
+from components.interfaces.all_interfaces import Embedder
 
 logging.basicConfig(
     level=logging.INFO,  # Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
@@ -14,10 +15,13 @@ class VectorIndexer:
     def __init__(
         self,
         document_loader: DocumentLoader,
-        document_splitter: DocumentSplitter
+        document_splitter: DocumentSplitter,
+        embedder: Embedder
+
     ):
         self.document_loader = document_loader
         self.document_splitter = document_splitter
+        self.embedder = embedder
         self.logger = logging.getLogger('VectorIndexer')
 
     def process(self, path: str) -> None:
@@ -34,5 +38,11 @@ class VectorIndexer:
         number_of_docs_split = len(split_documents)
         self.logger.info(f"RESULTS OF THE SPLIT IS {number_of_docs_split} DOCUMENTS")
         assert number_of_docs_split is not None and number_of_docs_split != 0
+
+        self.logger.info("BEGIN EMBEDDING")
+        embeddings = self.embedder.embed(split_documents)
+        number_of_vectors_generated = len(embeddings)
+        self.logger.info(f"RESULTS OF THE EMBEDDING IS {number_of_vectors_generated} VECTORS")
+        assert number_of_vectors_generated is not None and number_of_vectors_generated != 0
         
         self.logger.info("END")

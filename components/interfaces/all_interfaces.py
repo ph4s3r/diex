@@ -21,7 +21,7 @@ class DocumentSplitter(ABC):
 class Embedder(ABC):
     @abstractmethod
     # create vector embeddings from langchain_core.documents.base.Document items
-    def embed(self, documents: List[Document]) -> Any:
+    def embed(self, documents: List[Document]) -> List[List[float]]:
         pass
 
 

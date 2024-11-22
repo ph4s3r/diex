@@ -20,76 +20,64 @@ def setup_logging(logs_dir: Path = Path('logs')):
     main_logger = logging.getLogger('main')
     main_logger.setLevel(logging.INFO)
 
-    # Clear any existing handlers
     if main_logger.hasHandlers():
         main_logger.handlers.clear()
 
-    # Add file handler to the main logger
     main_log_file = run_dir / "main.log"
     main_file_handler = logging.FileHandler(main_log_file)
     main_file_handler.setFormatter(formatter)
     main_logger.addHandler(main_file_handler)
 
-    # Add console handler
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(formatter)
     main_logger.addHandler(console_handler)
 
-    # Prevent log propagation
+    # prevent propagation to the root logger
     main_logger.propagate = False
 
-    # Function to add a FileHandler and StreamHandler to a specific logger
+    # function to add a FileHandler and StreamHandler to a specific logger (double logger)
     def add_file_and_stdout_handler(logger_name: str, level: int):
         logger = logging.getLogger(logger_name)
         logger.setLevel(level)
 
-        # Clear existing handlers
         if logger.hasHandlers():
             logger.handlers.clear()
 
-        # FileHandler
         log_file = run_dir / f"{logger_name}.log"
         file_handler = logging.FileHandler(log_file)
         file_handler.setFormatter(formatter)
-
-        # StreamHandler
         stream_handler = logging.StreamHandler()
         stream_handler.setFormatter(formatter)
-
-        # Add both handlers
         logger.addHandler(file_handler)
         logger.addHandler(stream_handler)
 
-        # Prevent propagation to the root logger
+        # prevent propagation to the root logger
         logger.propagate = False
 
-    # Setup VectorIndexer logger
-    add_file_and_stdout_handler('VectorIndexer', logging.INFO)
-
-    # Function to configure a logger to log only to a file (e.g., unstructured)
+    # function to configure a logger to log only to a file
     def add_file_only_handler(logger_name: str, level: int):
         logger = logging.getLogger(logger_name)
         logger.setLevel(level)
 
-        # Clear existing handlers
         if logger.hasHandlers():
             logger.handlers.clear()
 
-        # FileHandler
         log_file = run_dir / f"{logger_name}.log"
         file_handler = logging.FileHandler(log_file)
         file_handler.setFormatter(formatter)
-
-        # Add the handler
         logger.addHandler(file_handler)
 
-        # Prevent propagation to the root logger
+        # prevent propagation to the root logger
         logger.propagate = False
 
-    # Setup unstructured logger to log only to a file
-    add_file_only_handler('unstructured', logging.INFO)
 
-    # Log the run time in the main log
+    # declare loggers and their loglevels here
+    add_file_and_stdout_handler('VectorIndexer', logging.INFO)
+    add_file_and_stdout_handler('DocumentLoader', logging.INFO)
+    add_file_only_handler('unstructured', logging.INFO)
+    add_file_and_stdout_handler('Splitter', logging.INFO)
+    add_file_and_stdout_handler('Embedder', logging.INFO)
+
     main_logger.info(f"Log folder: {run_dir}")
 
     return run_dt, run_dir
