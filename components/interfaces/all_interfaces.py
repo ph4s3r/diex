@@ -28,5 +28,5 @@ class Embedder(ABC):
 class VectorInserter(ABC):
     @abstractmethod
     # insert vector embeddings to a vector database
-    def upload(self, embeddings: Any) -> str:
+    def insert(self, Vectors: List[List[float]]) -> None:
         pass

@@ -1,7 +1,6 @@
-import logging
 from logconf import setup_logging
 
-from dependency_injector.wiring import Provide, inject, providers
+from dependency_injector.wiring import Provide, inject
 from container import Container
 from components.services.vector_indexer import VectorIndexer
 

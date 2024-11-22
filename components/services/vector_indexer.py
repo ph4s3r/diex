@@ -2,9 +2,10 @@ import logging
 from components.interfaces.all_interfaces import DocumentLoader
 from components.interfaces.all_interfaces import DocumentSplitter
 from components.interfaces.all_interfaces import Embedder
+from components.interfaces.all_interfaces import VectorInserter
 
 logging.basicConfig(
-    level=logging.INFO,  # Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    level=logging.INFO,  # logging levels: DEBUG, INFO, WARNING, ERROR, CRITICAL
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler()
@@ -16,12 +17,14 @@ class VectorIndexer:
         self,
         document_loader: DocumentLoader,
         document_splitter: DocumentSplitter,
-        embedder: Embedder
+        embedder: Embedder,
+        vector_inserter = VectorInserter
 
     ):
         self.document_loader = document_loader
         self.document_splitter = document_splitter
         self.embedder = embedder
+        self.vector_inserter = vector_inserter
         self.logger = logging.getLogger('VectorIndexer')
 
     def process(self, path: str) -> None:
@@ -44,5 +47,8 @@ class VectorIndexer:
         number_of_vectors_generated = len(embeddings)
         self.logger.info(f"RESULTS OF THE EMBEDDING IS {number_of_vectors_generated} VECTORS")
         assert number_of_vectors_generated is not None and number_of_vectors_generated != 0
+
+        self.logger.info("BEGIN INSERTING")
+        self.vector_inserter.insert(embeddings)
         
         self.logger.info("END")

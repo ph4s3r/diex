@@ -1,10 +1,10 @@
 import logging
 from pathlib import Path
 from datetime import datetime
+
+
 def setup_logging(logs_dir: Path = Path('logs')):
-    """
-    Sets up logging for the application with plain-text formatting.
-    """
+
     # Generate folder name based on current datetime
     run_dt = datetime.now().strftime('%b%d-%H%M').lower()
     run_dir = logs_dir / run_dt

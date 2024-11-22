@@ -19,9 +19,9 @@ embedder:
       initial_delay: 1.0
       max_delay: 60.0
 
-vector_inserter:
-  local:
-    endpoint: "http://localhost:8000"
-  remote:
-    endpoint: "https://api.remote-vectordb.com"
-    auth_token: "YOUR_AUTH_TOKEN"
+chroma:
+  url: 51.103.224.94
+  port: 8000
+  tenant: default
+  database: azuredocs
+  collection: diaxtest
