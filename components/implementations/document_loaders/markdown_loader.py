@@ -7,6 +7,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from langchain_core.documents import Document
 from langchain_community.document_loaders import UnstructuredMarkdownLoader
 import os  # for cpu_count()
+from tqdm import tqdm  # For progress bar
 
 
 class MarkdownLoader(DocumentLoader):
@@ -37,7 +38,6 @@ class MarkdownLoader(DocumentLoader):
             Optional[List[Document]]: A list of Document objects if successful, else None.
         """
         try:
-            self.logger.debug(f"Loading file: {md_file}")
             loader = UnstructuredMarkdownLoader(
                 str(md_file),
                 mode="single"  # one doc per markdown file
@@ -45,16 +45,13 @@ class MarkdownLoader(DocumentLoader):
             docs: List[Document] = loader.load()
 
             if not docs:
-                self.logger.warning(f"No content loaded from {md_file}")
                 return None
 
             for doc in docs:
                 if doc:
                     # Retain source filename as metadata
                     doc.metadata = {"source": str(md_file)}
-                    self.logger.debug(f"Indexed markdown file: {md_file}")
 
-            # self.logger.info(f"Successfully loaded {len(docs)} document(s) from {md_file}")
             return docs
 
         except Exception as e:
@@ -87,12 +84,14 @@ class MarkdownLoader(DocumentLoader):
 
             all_docs: List[Document] = []
 
+            # Initialize the progress bar
             with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
                 # Submit all file loading tasks
-                future_to_file = {executor.submit(self._load_single_file, md_file): md_file for md_file in markdown_files}
+                futures = {executor.submit(self._load_single_file, md_file): md_file for md_file in markdown_files}
 
-                for future in as_completed(future_to_file):
-                    md_file = future_to_file[future]
+                # Use tqdm to display the progress
+                for future in tqdm(as_completed(futures), total=num_files, desc="Loading Markdown files"):
+                    md_file = futures[future]
                     try:
                         docs = future.result()
                         if docs:
@@ -100,6 +99,7 @@ class MarkdownLoader(DocumentLoader):
                     except Exception as e:
                         self.logger.error(f"Unhandled exception for {md_file}: {e}")
 
+            # Log progress at intervals
             self.logger.info(f"Successfully loaded {len(all_docs)} document(s) from {num_files} file(s)")
             return all_docs
 
