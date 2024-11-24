@@ -3,9 +3,9 @@ embedding_type: openai                # options: openai, other_embedding_service
 
 
 documentloader:
-  file_path: "/home/peet/dev/azure-docs-md-full/articles/virtual-network"        # absolute
-  # file_path: "files/"                                                          # relative
-  max_workers: 64
+  file_path: "/home/peet/dev/azure-docs-md-full/articles/azure-resource-manager"        # absolute
+  # file_path: "files/"                                                                 # relative
+  max_workers: 16
 
 splitter:
   chunk_size: 750
@@ -18,15 +18,11 @@ splitter:
 embedder:
   openai:
     model: "text-embedding-3-small"           #options: https://platform.openai.com/docs/guides/embeddings/
-    batch_size: 16
-    rate_limit_config:
-      max_retries: 5
-      initial_delay: 1.0
-      max_delay: 60.0
+    batch_size: 1024
 
 chroma:
   url: chroma.d3eyekfegubub9fz.switzerlandnorth.azurecontainer.io
   port: 8000
   tenant: default_tenant
   database: default_database
-  collection: vnets
+  collection: arm

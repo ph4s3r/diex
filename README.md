@@ -10,3 +10,7 @@ output: result of indexing
 ## How it do
 
 the vector indexer service defines an implementation-independent flow wiring together the component interfaces 
+
+## Useful docs:
+
+https://cookbook.chromadb.dev/embeddings/embedding-models/

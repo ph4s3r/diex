@@ -63,9 +63,9 @@ class OpenAIEmbedder(Embedder):
             self.logger.error(f"Cannot get content from documents: {e}")
 
         # Static rate limiting configuration
-        max_retries = 5          # Maximum number of retry attempts
-        initial_delay = 1.0      # Initial delay between retries in seconds
-        max_delay = 60.0         # Maximum delay between retries in seconds
+        max_retries = 5             # Maximum number of retry attempts
+        initial_delay = 20.0        # Initial delay between retries in seconds
+        max_delay = 60.0            # Maximum delay between retries in seconds
 
         model = str(self.model)
 
