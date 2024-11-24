@@ -1,6 +1,10 @@
-file_type: markdown # options: markdown, pdf, txt
-embedding_type: openai # options: openai, other_embedding_service
-upload_type: remote # options: local, remote
+file_type: markdown                   # options: markdown, pdf, txt
+embedding_type: openai                # options: openai, other_embedding_service
+
+
+documentloader:
+  file_path: "/home/peet/dev/azure-docs-md-full/"        # absolute
+  # file_path: "files/"                             $ relative
 
 splitter:
   chunk_size: 750
@@ -12,7 +16,7 @@ splitter:
 
 embedder:
   openai:
-    model: "text-embedding-3-small" #options: https://platform.openai.com/docs/guides/embeddings/
+    model: "text-embedding-3-small"           #options: https://platform.openai.com/docs/guides/embeddings/
     batch_size: 16
     rate_limit_config:
       max_retries: 5
@@ -20,8 +24,8 @@ embedder:
       max_delay: 60.0
 
 chroma:
-  url: 51.103.224.94
+  url: chroma.d3eyekfegubub9fz.switzerlandnorth.azurecontainer.io
   port: 8000
-  tenant: default
-  database: azuredocs
-  collection: diaxtest
+  tenant: default_tenant
+  database: default_database
+  collection: universe

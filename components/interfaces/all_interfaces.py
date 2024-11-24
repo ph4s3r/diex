@@ -7,7 +7,7 @@ from langchain_core.documents import Document
 class DocumentLoader(ABC):
     @abstractmethod
     # load data from a document source and return them in a List of langchain_core.documents.base.Document type
-    def load(self, path: str) -> List[Document]:
+    def load(self) -> List[Document]:
         pass
 
 

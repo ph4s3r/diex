@@ -10,9 +10,7 @@ def main(service: VectorIndexer = Provide[Container.vector_indexer_service]) -> 
    
     setup_logging()
 
-    path = "files/vnets.md"
-
-    service.process(path)
+    service.process()
 
 if __name__ == "__main__":
 

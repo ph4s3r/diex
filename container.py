@@ -10,11 +10,11 @@ from components.implementations.vectordb_inserters.chroma_inserter import Chroma
 class Container(containers.DeclarativeContainer):
 
     config = providers.Configuration()   
-
+   
     document_loader = providers.Selector(
         config.file_type,
-        markdown=providers.Factory(MarkdownLoader),
-        pdf=providers.Factory(PDFLoader)
+        markdown=providers.Factory(MarkdownLoader, file_path=config.documentloader.file_path),
+        pdf=providers.Factory(PDFLoader, file_path=config.documentloader.file_path)
     )
     
     document_splitter = providers.Factory(
