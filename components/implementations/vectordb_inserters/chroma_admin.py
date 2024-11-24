@@ -7,9 +7,9 @@
 
 
 
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+# __import__('pysqlite3')
+# import sys
+# sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 from chromadb import AdminClient
 
@@ -97,4 +97,4 @@ if __name__ == "__main__":
     admin.get_tenant("default")
 
     # Create a database under a specific tenant
-    admin.create_database("azuredocs", tenant_name="default")
+    admin.get_database("azuredocs", tenant_name="default")

@@ -11,8 +11,21 @@
 
 import chromadb
 chroma_client = chromadb.HttpClient(
-    host="51.103.224.94",
+    host="chroma.d3eyekfegubub9fz.switzerlandnorth.azurecontainer.io",
     port=8000
 )
 print("trying to ping the server")
-print(chroma_client.heartbeat())
+print("heartbeat received:", chroma_client.heartbeat())
+
+print("running chroma version:", chroma_client.get_version())
+# print("settings:", chroma_client.get_settings())
+print("get_max_batch_size:", chroma_client.get_max_batch_size())
+
+collections = chroma_client.list_collections()
+
+for i, coll in enumerate(collections):
+    print(i, coll)
+
+print("peeking into a collection: ", collections[0].peek())
+
+
