@@ -3,8 +3,8 @@ embedding_type: openai                # options: openai, other_embedding_service
 
 
 documentloader:
-  file_path: "/home/peet/dev/azure-docs-md-full/"        # absolute
-  # file_path: "files/"                             $ relative
+  file_path: "/home/peet/dev/azure-docs-md-full/articles/virtual-network"        # absolute
+  # file_path: "files/"                                                          # relative
   max_workers: 64
 
 splitter:
@@ -29,4 +29,4 @@ chroma:
   port: 8000
   tenant: default_tenant
   database: default_database
-  collection: universe
+  collection: vnets

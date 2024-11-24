@@ -32,13 +32,13 @@ class VectorIndexer:
         self.logger.info(f"RESULTS OF THE SPLIT IS {number_of_docs_split} DOCUMENTS")
         assert number_of_docs_split is not None and number_of_docs_split != 0
 
-        # self.logger.info("BEGIN EMBEDDING")
-        # embeddings = self.embedder.embed(split_documents)
-        # number_of_vectors_generated = len(embeddings)
-        # self.logger.info(f"RESULTS OF THE EMBEDDING IS {number_of_vectors_generated} VECTORS")
-        # assert number_of_vectors_generated is not None and number_of_vectors_generated != 0
+        self.logger.info("BEGIN EMBEDDING")
+        embeddings = self.embedder.embed(split_documents)
+        number_of_vectors_generated = len(embeddings)
+        self.logger.info(f"RESULTS OF THE EMBEDDING IS {number_of_vectors_generated} VECTORS")
+        assert number_of_vectors_generated is not None and number_of_vectors_generated != 0
 
         self.logger.info("BEGIN INSERTING")
-        self.vector_inserter.insert(documents=split_documents)
+        self.vector_inserter.insert(documents=split_documents, vectors=embeddings)
         
         self.logger.info("END")

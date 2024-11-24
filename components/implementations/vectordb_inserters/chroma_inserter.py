@@ -98,6 +98,7 @@ class ChromaDBRemoteInserter(VectorInserter):
 
     # def list_indexed_documents(self) -> List[Tuple[dict, str]]:
     #     """
+    #     """
     #     Lists all indexed documents, returning a list of tuples with metadata and content.
     #     """
 

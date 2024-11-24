@@ -28,4 +28,18 @@ for i, coll in enumerate(collections):
 
 print("peeking into a collection: ", collections[0].peek())
 
+# query:
+
+# def query(
+#         query_embeddings: Optional[OneOrMany[Embedding]] = None,
+#         query_texts: Optional[OneOrMany[Document]] = None,
+#         n_results: int = 10,
+#         where: Optional[Where] = None,
+#         where_document: Optional[WhereDocument] = None,
+#         include: Include = ["metadatas", "documents",
+#                             "distances"]) -> QueryResult
+
+
+
+
 
