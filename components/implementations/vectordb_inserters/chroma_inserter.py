@@ -36,7 +36,6 @@ class ChromaDBRemoteInserter(VectorInserter):
     def insert(self, documents: List[Document], vectors: Optional[List[List[float]]] = None) -> None:
 
         self.logger.info("Starting Inserting process to ChromaDB")
-        self.logger.info(f"Inserter received {len(vectors)} vectors")
         self.logger.info(f"Will use {str(self.embedding_model)} embedding model")
         self.logger.info(f"Initiating chroma connection at {self.url}:{self.port}, tenant: {self.tenant}, database: {self.database}")
 
@@ -71,22 +70,26 @@ class ChromaDBRemoteInserter(VectorInserter):
 
         uuids = [str(uuid4()) for _ in range(len(documents))]
 
-        # can pass raw documents as well...
+        documents_str = [document.page_content for document in documents]
+
         if vectors is None:
-            self.logger.info("Trying to add documents to the collection")
-            collection.add(
-                documents=documents,
+            self.logger.info("No vectors received, will let langchain to do the embeddings.")
+            self.logger.info("Trying to upsert the documents to the collection")
+            collection.upsert(
+                documents=documents_str,
                 ids=uuids
             )
         else:
-            self.logger.info("Trying to add the vectors and documents to the collection")
+            self.logger.info("Trying to upsert the vectors and documents to the collection")
             metadatas = [document.metadata for document in documents]
-            collection.add(
-                documents=documents,
+            collection.upsert(
+                documents=documents_str,
                 embeddings=vectors,
                 metadatas=metadatas,
                 ids=uuids
             )
+
+        self.logger.info("Successfully upserted all the stuff YaYY! :)")
 
 
 
