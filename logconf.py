@@ -23,7 +23,6 @@ class ColorFormatter(logging.Formatter):
             record.msg = f"{level_color}{record.msg}{RESET}"
         return super().format(record)
 
-
 def setup_logging(logs_dir: Path = Path('logs')):
     # Generate folder name based on current datetime
     run_dt = datetime.now().strftime('%b%d-%H%M').lower()
@@ -102,6 +101,10 @@ def setup_logging(logs_dir: Path = Path('logs')):
     add_file_and_stdout_handler('Splitter', logging.INFO)
     add_file_and_stdout_handler('Embedder', logging.INFO)
     add_file_and_stdout_handler('Inserter', logging.INFO)
+
+    # **Add loggers for torch and sentence_transformers**
+    add_file_and_stdout_handler('torch', logging.WARNING)  # Set to WARNING to reduce verbosity
+    add_file_and_stdout_handler('sentence_transformers', logging.INFO)
 
     main_logger.info(f"Log folder: {run_dir}")
 

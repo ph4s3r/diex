@@ -36,7 +36,7 @@ class ChromaDBRemoteInserter(VectorInserter):
     def insert(self, documents: List[Document], vectors: Optional[List[List[float]]] = None) -> None:
 
         self.logger.info("Starting Inserting process to ChromaDB")
-        self.logger.info(f"Will use {str(self.embedding_model)} embedding model")
+        self.logger.info(f"Using {str(self.embedding_model)} embedding model")
         self.logger.info(f"Initiating chroma connection at {self.url}:{self.port}, tenant: {self.tenant}, database: {self.database}")
 
         # openai_ef = embedding_functions.OpenAIEmbeddingFunction(
@@ -44,7 +44,7 @@ class ChromaDBRemoteInserter(VectorInserter):
         #                 model_name=self.embedding_model
         #             )
         
-        sentence_transformer_ef = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="nvidia/NV-Embed-v2")
+        sentence_transformer_ef = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=self.embedding_model)
 
 
         try:
@@ -57,19 +57,19 @@ class ChromaDBRemoteInserter(VectorInserter):
             os._exit(100)
 
 
-        self.logger.info("Trying to get collections")
+        self.logger.info("Trying to list collections")
         collections: os.Sequence[chromadb.Collection] = self.chroma_client.list_collections()
         if len(collections) > 0:
             self.logger.info(f"Collections found: {collections}")
         else:
-            self.logger.info(f"No collections found, but will create one!")
+            self.logger.info(f"No collections found, now we will create one!")
 
         collection = self.chroma_client.get_or_create_collection(
             name = self.collection,
             embedding_function = sentence_transformer_ef
             )
         
-        self.logger.info(f"Collection {self.collection} found")
+        self.logger.info(f"Inserting will be attempted to collection: {self.collection}")
 
         uuids = [str(uuid4()) for _ in range(len(documents))]
 

@@ -37,7 +37,8 @@ class Container(containers.DeclarativeContainer):
 
     # Embedder Provider
     embedder = providers.Singleton(
-        SentenceTransformerEmbedder
+        SentenceTransformerEmbedder,
+        embedding_model=config.embedder.embedding_model
     )
 
     # Vector Inserter Provider
@@ -48,7 +49,7 @@ class Container(containers.DeclarativeContainer):
         tenant=config.chroma.tenant,
         database=config.chroma.database,
         collection=config.chroma.collection,
-        embedding_model=config.embedder.openai.model
+        embedding_model=config.embedder.embedding_model
     )
 
     # Vector Indexer Service Provider

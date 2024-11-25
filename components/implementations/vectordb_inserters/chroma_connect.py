@@ -10,6 +10,7 @@
 # sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 import chromadb
+import chromadb.utils.embedding_functions as embedding_functions
 chroma_client = chromadb.HttpClient(
     host="chroma.d3eyekfegubub9fz.switzerlandnorth.azurecontainer.io",
     port=8000
@@ -26,7 +27,24 @@ collections = chroma_client.list_collections()
 for i, coll in enumerate(collections):
     print(i, coll)
 
-print("peeking into a collection: ", collections[0].peek())
+# print("peeking into a collection: ", collections[0].peek())
+
+st_ef = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="dunzhang/stella_en_1.5B_v5")
+
+queries = [
+    "How to set up a GitHub Actions workflow to register an API?",
+]
+c = collections[0]
+
+c._embedding_function = st_ef
+
+results = c.query(
+    query_texts=queries,        # Chroma will embed this for you
+    n_results=2                 # how many results to return
+)
+print(results)
+
+
 
 # query:
 
