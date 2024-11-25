@@ -3,6 +3,7 @@ from components.implementations.document_loaders.markdown_loader import Markdown
 from components.implementations.document_loaders.pdf_loader import PDFLoader
 from components.implementations.document_splitters.splitter import MDSplitter
 from components.implementations.embedders.openai_embedder import OpenAIEmbedder
+from components.implementations.embedders.st_embedder import SentenceTransformerEmbedder
 from components.implementations.vectordb_inserters.chroma_inserter import ChromaDBRemoteInserter
 from components.services.vector_indexer import VectorIndexer
 
@@ -35,13 +36,8 @@ class Container(containers.DeclarativeContainer):
     )
 
     # Embedder Provider
-    embedder = providers.Factory(
-        OpenAIEmbedder,
-        model=config.embedder.openai.model,
-        batch_size=config.embedder.openai.batch_size,
-        max_tokens_per_minute=config.embedder.openai.max_tokens_per_minute,
-        max_requests_per_minute=config.embedder.openai.max_requests_per_minute,
-        batch_queue_limit=config.embedder.openai.batch_queue_limit
+    embedder = providers.Singleton(
+        SentenceTransformerEmbedder
     )
 
     # Vector Inserter Provider

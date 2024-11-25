@@ -44,12 +44,6 @@ class OpenAIEmbedder(Embedder):
 
         # Configure logger
         self.logger = logging.getLogger('Embedder')
-        handler = logging.StreamHandler()
-        formatter = logging.Formatter('[%(asctime)s] %(levelname)s:%(name)s: %(message)s')
-        handler.setFormatter(formatter)
-        if not self.logger.handlers:
-            self.logger.addHandler(handler)
-        self.logger.setLevel(logging.INFO)
 
         # Initialize tokenizer using the appropriate encoding for the model
         try:

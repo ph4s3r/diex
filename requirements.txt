@@ -1,8 +1,13 @@
 # latest stable releases at the time of writing
 dependency_injector==4.43.0
-langchain-openai    ==0.2.9
+langchain-openai==0.2.9
 langchain-core==0.3.19
 langchain-community==0.3.7
 unstructured==0.11.8
 markdown==3.7
+# chromadb
 chromadb-client==0.5.20
+# nvidia nv-embed-v2
+sentence-transformers==3.3.1
+datasets
+einops

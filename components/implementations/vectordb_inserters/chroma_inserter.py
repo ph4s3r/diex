@@ -39,10 +39,13 @@ class ChromaDBRemoteInserter(VectorInserter):
         self.logger.info(f"Will use {str(self.embedding_model)} embedding model")
         self.logger.info(f"Initiating chroma connection at {self.url}:{self.port}, tenant: {self.tenant}, database: {self.database}")
 
-        openai_ef = embedding_functions.OpenAIEmbeddingFunction(
-                        api_key=os.getenv("OPENAI_API_KEY"),
-                        model_name=self.embedding_model
-                    )
+        # openai_ef = embedding_functions.OpenAIEmbeddingFunction(
+        #                 api_key=os.getenv("OPENAI_API_KEY"),
+        #                 model_name=self.embedding_model
+        #             )
+        
+        sentence_transformer_ef = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="nvidia/NV-Embed-v2")
+
 
         try:
             self.chroma_client: chromadb.ClientAPI = chromadb.HttpClient(
@@ -63,7 +66,7 @@ class ChromaDBRemoteInserter(VectorInserter):
 
         collection = self.chroma_client.get_or_create_collection(
             name = self.collection,
-            embedding_function = openai_ef
+            embedding_function = sentence_transformer_ef
             )
         
         self.logger.info(f"Collection {self.collection} found")
