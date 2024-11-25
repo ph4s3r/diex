@@ -184,7 +184,7 @@ class OpenAIEmbedder(Embedder):
         @retry(
             reraise=True,
             retry=retry_if_exception_type(RateLimitError),
-            wait=wait_random_exponential(min=20, max=60),
+            wait=wait_random_exponential(min=61, max=120),
             stop=stop_after_attempt(10),
             before_sleep=before_sleep_log(self.logger, logging.WARNING)
         )
