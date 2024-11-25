@@ -3,9 +3,10 @@ embedding_type: openai                # options: openai, other_embedding_service
 
 
 documentloader:
-  file_path: "/home/peet/dev/azure-docs-md-full/articles/azure-resource-manager"        # absolute
+  # file_path: "/home/peet/dev/azure-docs-md-full/articles/azure-resource-manager"      # absolute nix
+  file_path: "G:\\dev\\azure-docs-md"                                                   # absolute win
   # file_path: "files/"                                                                 # relative
-  max_workers: 16
+  max_workers: 32
 
 splitter:
   chunk_size: 750
@@ -18,11 +19,14 @@ splitter:
 embedder:
   openai:
     model: "text-embedding-3-small"           #options: https://platform.openai.com/docs/guides/embeddings/
-    batch_size: 1024
+    batch_size: 2048
+    max_tokens_per_minute: 150000             # TPM: error: on tokens per min (TPM): Limit 150000, Requested 172752. 
+    max_requests_per_minute: 3000             # RPM: 3,000 
+    batch_queue_limit: 3000000                # Batch Queue Limit: 3,000,000
 
 chroma:
   url: chroma.d3eyekfegubub9fz.switzerlandnorth.azurecontainer.io
   port: 8000
   tenant: default_tenant
   database: default_database
-  collection: arm
+  collection: universe

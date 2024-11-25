@@ -37,8 +37,11 @@ class Container(containers.DeclarativeContainer):
     # Embedder Provider
     embedder = providers.Factory(
         OpenAIEmbedder,
-        model=config.embedder.openai.model, 
-        batch_size=config.embedder.openai.batch_size
+        model=config.embedder.openai.model,
+        batch_size=config.embedder.openai.batch_size,
+        max_tokens_per_minute=config.embedder.openai.max_tokens_per_minute,
+        max_requests_per_minute=config.embedder.openai.max_requests_per_minute,
+        batch_queue_limit=config.embedder.openai.batch_queue_limit
     )
 
     # Vector Inserter Provider
