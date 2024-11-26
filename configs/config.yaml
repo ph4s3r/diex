@@ -4,8 +4,8 @@ embedding_type: openai                # options: openai, other_embedding_service
 
 documentloader:
   # file_path: "/home/peet/dev/azure-docs-md-full/articles/azure-resource-manager"      # absolute nix
-  # file_path: "G:\\dev\\azure-docs-md"                                                   # absolute win
-  file_path: "files/"                                                                 # relative
+  file_path: "G:\\dev\\azuremd_done\\virtual-network"                                                   # absolute win
+  # file_path: "files/"                                                                 # relative
   max_workers: 48
 
 splitter:
@@ -17,7 +17,8 @@ splitter:
     - ["###", "Header 3"]
 
 embedder:
-  embedding_model: "dunzhang/stella_en_1.5B_v5"           #options: https://platform.openai.com/docs/guides/embeddings/
+  embedding_model: "text-embedding-3-small"          #options: https://platform.openai.com/docs/guides/embeddings/
+  # embedding_model: "dunzhang/stella_en_1.5B_v5" 
   openai:
     batch_size: 2048
     max_tokens_per_minute: 150000             # TPM: error: on tokens per min (TPM): Limit 150000, Requested 172752. 
@@ -31,4 +32,4 @@ chroma:
   port: 8000
   tenant: default_tenant
   database: default_database
-  collection: dunz
+  collection: openai

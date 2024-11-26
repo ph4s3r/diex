@@ -33,19 +33,19 @@ class Container(containers.DeclarativeContainer):
         headers_to_split_on=config.splitter.headers_to_split_on
     )
 
-    embedder = providers.Singleton(
-        SentenceTransformerEmbedder,
-        embedding_model=config.embedder.embedding_model
-    )
-
-    # embedder = providers.Factory(
-    #     OpenAIEmbedder,
-    #     model=config.embedder.embedding_model,
-    #     batch_size=config.embedder.openai.batch_size,
-    #     max_tokens_per_minute=config.embedder.openai.max_tokens_per_minute,
-    #     max_requests_per_minute=config.embedder.openai.max_requests_per_minute,
-    #     batch_queue_limit=config.embedder.openai.batch_queue_limit
+    # embedder = providers.Singleton(
+    #     SentenceTransformerEmbedder,
+    #     embedding_model=config.embedder.embedding_model
     # )
+
+    embedder = providers.Singleton(
+        OpenAIEmbedder,
+        model=config.embedder.embedding_model,
+        batch_size=config.embedder.openai.batch_size,
+        max_tokens_per_minute=config.embedder.openai.max_tokens_per_minute,
+        max_requests_per_minute=config.embedder.openai.max_requests_per_minute,
+        batch_queue_limit=config.embedder.openai.batch_queue_limit
+    )
 
     vector_inserter = providers.Singleton(
         ChromaDBRemoteInserter,
