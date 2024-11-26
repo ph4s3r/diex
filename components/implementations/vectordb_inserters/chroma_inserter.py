@@ -4,6 +4,7 @@ import os
 import logging
 import chromadb
 from uuid import uuid4
+from datetime import datetime
 from typing import List, Optional
 from langchain_core.documents import Document
 import chromadb.utils.embedding_functions as embedding_functions
@@ -69,7 +70,11 @@ class ChromaDBRemoteInserter(VectorInserter):
 
         collection = self.chroma_client.get_or_create_collection(
             name = self.collection,
-            embedding_function = ef
+            embedding_function = ef,
+            metadata={
+                "model":self.embedding_model,
+                "lastupdated":datetime.now()
+                }
             )
         
         self.logger.info(f"Inserting will be attempted to collection: {self.collection}")
