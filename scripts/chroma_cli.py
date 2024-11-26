@@ -87,9 +87,11 @@ class ChromaCLI:
             table.add_column("No.", style="dim", width=6)
             table.add_column("Collection Name", style="cyan")
             table.add_column("Number of Embeddings", style="green")
+            table.add_column("Model", style="yellow")
             for idx, coll in enumerate(collections, start=1):
                 count = coll.count()  # Number of embeddings in the collection
-                table.add_row(str(idx), coll.name, str(count))
+                model = coll.metadata.get("model", "Not specified") if coll.metadata else "Not specified"
+                table.add_row(str(idx), coll.name, str(count), model)
             console.print("\n[bold cyan]Available Collections[/bold cyan]")
             console.print(table)
             return collections
@@ -109,28 +111,37 @@ class ChromaCLI:
         selected_index = int(choice.split(".")[0]) - 1
         self.selected_collection = collections[selected_index]
         console.print(f"[bold green]Selected Collection:[/bold green] {self.selected_collection.name}")
-
-    def select_embedding_model(self):
-        self.embedding_model = questionary.select(
-            "Select an embedding model:",
-            choices=EMBEDDING_MODELS
-        ).ask()
-        if self.embedding_model is None:
-            console.print("[red]No embedding model selected. Operation cancelled.[/red]")
-            return False
-        console.print(f"[bold green]Selected Embedding Model:[/bold green] {self.embedding_model}")
-        # Set embedding function for the selected collection
         
-        if self.embedding_model in ["text-embedding-3-small", "text-embedding-3-large", "text-embedding-ada-002"]:
-            ef = embedding_functions.OpenAIEmbeddingFunction(
-                            api_key=os.getenv("OPENAI_API_KEY"),
-                            model_name=self.embedding_model
-                        )
-        else:
-            ef = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=self.embedding_model)
-
-        self.selected_collection._embedding_function = ef
-        return True
+        # Retrieve and display metadata
+        try:
+            metadata = self.selected_collection.metadata
+            model = metadata.get("model", "Not specified") if metadata else "Not specified"
+            last_updated = metadata.get("lastupdated", "Not specified") if metadata else "Not specified"
+            
+            console.print("\n[bold magenta]Collection Metadata[/bold magenta]")
+            table = Table(show_header=True, header_style="bold magenta", box=box.MINIMAL_DOUBLE_HEAD)
+            table.add_column("Attribute", style="dim", width=20)
+            table.add_column("Value")
+            table.add_row("Model", model)
+            table.add_row("Last Updated", last_updated)
+            console.print(table)
+            
+            # Set embedding model from metadata
+            self.embedding_model = model
+            if self.embedding_model in ["text-embedding-3-small", "text-embedding-3-large", "text-embedding-ada-002"]:
+                ef = embedding_functions.OpenAIEmbeddingFunction(
+                    api_key=os.getenv("OPENAI_API_KEY"),
+                    model_name=self.embedding_model
+                )
+            else:
+                ef = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=self.embedding_model)
+            
+            self.selected_collection._embedding_function = ef
+            console.print(f"[bold green]Embedding model set to '{self.embedding_model}' from metadata.[/bold green]")
+            
+        except Exception as e:
+            console.print(f"[bold red]Error retrieving or setting metadata: {e}[/bold red]")
+            sys.exit(1)
 
     def peek_collection(self):
         try:
@@ -141,15 +152,22 @@ class ChromaCLI:
                 console.print("[yellow]No items to peek in the collection.[/yellow]")
                 return
             
-            pprint(peek_result.get('ids'))
-            pprint(peek_result.get('embeddings'))
-            pprint(peek_result.get('metadatas'))
-            for doc in peek_result.get('documents'):
-                console.print(doc,new_line_start=True,highlight=True)
-            pprint(peek_result.get('data'))
-            pprint(peek_result.get('uris'))
-            pprint(peek_result.get('included'))
+            # Function to replace \n with actual new lines in all string fields
+            def replace_newlines(obj):
+                if isinstance(obj, dict):
+                    return {k: replace_newlines(v) for k, v in obj.items()}
+                elif isinstance(obj, list):
+                    return [replace_newlines(elem) for elem in obj]
+                elif isinstance(obj, str):
+                    return obj.replace("\\n", "\n")
+                else:
+                    return obj
 
+            formatted_peek = replace_newlines(peek_result)
+            
+            # Pretty print the formatted peek result
+            console.print_json(data=json.dumps(formatted_peek, indent=2))
+    
         except Exception as e:
             console.print(f"[bold red]Error peeking into collection: {e}[/bold red]")
 
@@ -168,7 +186,7 @@ class ChromaCLI:
     def perform_query(self):
         # Only allow queries if an embedding model has been selected
         if not self.embedding_model:
-            console.print("[red]No embedding model selected. Please select an embedding model first.[/red]")
+            console.print("[red]No embedding model selected. Please select a collection with a valid embedding model.[/red]")
             return
         # Predefined queries
         predefined_queries = [
@@ -196,14 +214,24 @@ class ChromaCLI:
                     
             console.print("[bold cyan]Query Results[/bold cyan]")
            
-            pprint(f"IDs: {results.get('ids')}")
-            pprint(f"Embeddings: {results.get('embeddings')}")
-            pprint(f"Metadatas: {results.get('metadatas')}")
+            # Print using pprint
+            pprint("IDs: ")
+            pprint(results.get('ids'))
+            pprint("Embeddings: ")
+            pprint(results.get('embeddings'))
+            pprint("Metadatas: ")
+            pprint( results.get('metadatas'))
+            pprint("Document: ")
             for doc in results.get('documents'):
-                console.print(f"Document: {doc}", new_line_start=True, highlight=True)
-            pprint(f"Data: {results.get('data')}")
-            pprint(f"URIs: {results.get('uris')}")
-            pprint(f"Included: {results.get('included')}")
+                for chunk in doc:
+                    print(chunk)
+            pprint("Data: ")
+            pprint(results.get('data'))
+            pprint("URIs:")
+            pprint( results.get('uris'))
+            pprint("Included: ")
+            pprint(results.get('included'))
+
         except Exception as e:
             console.print(f"[bold red]Error performing query: {e}[/bold red]")
 
@@ -227,32 +255,28 @@ class ChromaCLI:
             action = questionary.select(
                 "Select an action:",
                 choices=[
-                    "1) Select an embedding model",
-                    "2) View collection information",
-                    "3) Peek into collection",
-                    "4) Delete collection",
-                    "5) Perform a query",
-                    "6) Exit"
+                    "1) View collection information",
+                    "2) Peek into collection",
+                    "3) Delete collection",
+                    "4) Perform a query",
+                    "5) Exit"
                 ]
             ).ask()
             
-            if action is None or action == "6) Exit":
+            if action is None or action == "5) Exit":
                 console.print("[bold yellow]Goodbye![/bold yellow]")
                 sys.exit(0)
             
             if action.startswith("1"):
-                self.select_embedding_model()
-            
-            elif action.startswith("2"):
                 self.view_collection_info()
             
-            elif action.startswith("3"):
+            elif action.startswith("2"):
                 self.peek_collection()
             
-            elif action.startswith("4"):
+            elif action.startswith("3"):
                 self.delete_collection()
             
-            elif action.startswith("5"):
+            elif action.startswith("4"):
                 self.perform_query()
             
             else:
@@ -269,11 +293,6 @@ class ChromaCLI:
         
         # Select a collection
         self.select_collection(collections)
-        
-        # Prompt to select embedding model once
-        if not self.select_embedding_model():
-            console.print("[red]Embedding model selection failed. Exiting.[/red]")
-            sys.exit(1)
         
         # Main menu
         self.main_menu()
