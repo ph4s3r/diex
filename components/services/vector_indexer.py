@@ -11,7 +11,6 @@ class VectorIndexer:
         document_splitter: DocumentSplitter,
         embedder: Embedder,
         vector_inserter = VectorInserter
-
     ):
         self.document_loader = document_loader
         self.document_splitter = document_splitter

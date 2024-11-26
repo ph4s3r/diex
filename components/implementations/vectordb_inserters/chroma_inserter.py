@@ -39,12 +39,15 @@ class ChromaDBRemoteInserter(VectorInserter):
         self.logger.info(f"Using {str(self.embedding_model)} embedding model")
         self.logger.info(f"Initiating chroma connection at {self.url}:{self.port}, tenant: {self.tenant}, database: {self.database}")
 
-        # openai_ef = embedding_functions.OpenAIEmbeddingFunction(
-        #                 api_key=os.getenv("OPENAI_API_KEY"),
-        #                 model_name=self.embedding_model
-        #             )
-        
-        sentence_transformer_ef = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=self.embedding_model)
+        ef = None
+
+        if self.embedding_model in ["text-embedding-3-small", "text-embedding-3-large", "text-embedding-ada-002"]:
+            ef = embedding_functions.OpenAIEmbeddingFunction(
+                            api_key=os.getenv("OPENAI_API_KEY"),
+                            model_name=self.embedding_model
+                        )
+        else:
+            ef = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=self.embedding_model)
 
 
         try:
@@ -66,7 +69,7 @@ class ChromaDBRemoteInserter(VectorInserter):
 
         collection = self.chroma_client.get_or_create_collection(
             name = self.collection,
-            embedding_function = sentence_transformer_ef
+            embedding_function = ef
             )
         
         self.logger.info(f"Inserting will be attempted to collection: {self.collection}")

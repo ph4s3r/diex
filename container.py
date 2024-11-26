@@ -13,7 +13,6 @@ class Container(containers.DeclarativeContainer):
 
     config = providers.Configuration()
 
-    # Document Loader Provider
     document_loader = providers.Selector(
         config.file_type,
         markdown=providers.Singleton(
@@ -27,7 +26,6 @@ class Container(containers.DeclarativeContainer):
         )
     )
     
-    # Document Splitter Provider with Config Injection
     document_splitter = providers.Singleton(
         MDSplitter,
         chunk_size=config.splitter.chunk_size,
@@ -35,13 +33,20 @@ class Container(containers.DeclarativeContainer):
         headers_to_split_on=config.splitter.headers_to_split_on
     )
 
-    # Embedder Provider
-    embedder = providers.Singleton(
-        SentenceTransformerEmbedder,
-        embedding_model=config.embedder.embedding_model
+    # embedder = providers.Singleton(
+    #     SentenceTransformerEmbedder,
+    #     embedding_model=config.embedder.embedding_model
+    # )
+
+    embedder = providers.Factory(
+        OpenAIEmbedder,
+        model=config.embedder.embedding_model,
+        batch_size=config.embedder.openai.batch_size,
+        max_tokens_per_minute=config.embedder.openai.max_tokens_per_minute,
+        max_requests_per_minute=config.embedder.openai.max_requests_per_minute,
+        batch_queue_limit=config.embedder.openai.batch_queue_limit
     )
 
-    # Vector Inserter Provider
     vector_inserter = providers.Singleton(
         ChromaDBRemoteInserter,
         url=config.chroma.url,
@@ -52,7 +57,6 @@ class Container(containers.DeclarativeContainer):
         embedding_model=config.embedder.embedding_model
     )
 
-    # Vector Indexer Service Provider
     vector_indexer_service = providers.Singleton(
         VectorIndexer,
         embedder=embedder,
