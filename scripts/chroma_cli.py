@@ -14,6 +14,7 @@ import sys
 import json
 import chromadb
 import chromadb.utils.embedding_functions as embedding_functions
+from sentence_transformers import SentenceTransformer
 from rich.console import Console
 from rich.table import Table
 from rich.prompt import Prompt
@@ -188,6 +189,17 @@ class ChromaCLI:
         if not self.embedding_model:
             console.print("[red]No embedding model selected. Please select a collection with a valid embedding model.[/red]")
             return
+
+        def embed_query(text: str):
+            query_prompt_name = "s2p_query"
+
+            model = SentenceTransformer(self.embedding_model, trust_remote_code=True)
+            query_embeddings = model.encode(text, prompt_name=query_prompt_name)
+            
+            print(f"Query Embedded with {self.embedding_model} successfully. query_embeddings.shape: {query_embeddings.shape}")
+
+            return query_embeddings
+
         # Predefined queries
         predefined_queries = [
             "How to set up a GitHub Actions workflow to register an API?",
@@ -207,10 +219,17 @@ class ChromaCLI:
 
         # Perform query
         try:
-            results = self.selected_collection.query(
-                query_texts=[query_text],
-                n_results=2
-            )
+            if self.embedding_model in ["dunzhang/stella_en_1.5B_v5"]:
+                query_embedding = embed_query(query_text) 
+                results = self.selected_collection.query(
+                    query_embeddings=[query_embedding],
+                    n_results=2
+                )
+            else:
+                results = self.selected_collection.query(
+                    query_texts=[query_text],
+                    n_results=2
+                )
                     
             console.print("[bold cyan]Query Results[/bold cyan]")
            
