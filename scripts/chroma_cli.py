@@ -137,8 +137,9 @@ class ChromaCLI:
             else:
                 ef = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=self.embedding_model)
             
+            # https://docs.trychroma.com/guides/embeddings chroma embedding function wrappers need to be set when working with a collection
             self.selected_collection._embedding_function = ef
-            console.print(f"[bold green]Embedding model set to '{self.embedding_model}' from metadata.[/bold green]")
+            console.print(f"[bold green]Embedding function set to '{self.selected_collection._embedding_function}' based on the metadata.[/bold green]")
             
         except Exception as e:
             console.print(f"[bold red]Error retrieving or setting metadata: {e}[/bold red]")
@@ -146,28 +147,44 @@ class ChromaCLI:
 
     def peek_collection(self):
         try:
-            peek_result = self.selected_collection.peek()
+            results = self.selected_collection.peek()
             console.print("[bold cyan]Peek into Collection[/bold cyan]")
 
-            if not peek_result:
+            if not results:
                 console.print("[yellow]No items to peek in the collection.[/yellow]")
                 return
             
-            # Function to replace \n with actual new lines in all string fields
-            def replace_newlines(obj):
-                if isinstance(obj, dict):
-                    return {k: replace_newlines(v) for k, v in obj.items()}
-                elif isinstance(obj, list):
-                    return [replace_newlines(elem) for elem in obj]
-                elif isinstance(obj, str):
-                    return obj.replace("\\n", "\n")
-                else:
-                    return obj
+            # returns a GetResult object:
 
-            formatted_peek = replace_newlines(peek_result)
+            # class GetResult(TypedDict):
+            #     ids: List[ID]
+            #     embeddings: Optional[
+            #         Union[Embeddings, PyEmbeddings, NDArray[Union[np.int32, np.float32]]]
+            #     ]
+            #     documents: Optional[List[Document]]
+            #     uris: Optional[URIs]
+            #     data: Optional[Loadable]
+            #     metadatas: Optional[List[Metadata]]
+            #     included: Include
             
-            # Pretty print the formatted peek result
-            console.print_json(data=json.dumps(formatted_peek, indent=2))
+        
+            pprint("IDs: ")
+            pprint(results.get('ids'))
+            pprint("Embeddings: ")
+            pprint(results.get('embeddings'))
+            pprint("Metadatas: ")
+            pprint( results.get('metadatas'))
+            pprint("Document: ")
+            # for doc in results.get('documents'):
+            #     for chunk in doc:
+            #         print(chunk)
+            pprint(results.get('documents'))
+            pprint("Data: ")
+            pprint(results.get('data'))
+            pprint("URIs:")
+            pprint( results.get('uris'))
+            pprint("Included: ")
+            pprint(results.get('included'))
     
         except Exception as e:
             console.print(f"[bold red]Error peeking into collection: {e}[/bold red]")
