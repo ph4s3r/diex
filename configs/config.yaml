@@ -4,7 +4,7 @@ embedding_type: openai                # options: openai, other_embedding_service
 
 documentloader:
   # file_path: "/home/peet/dev/azure-docs-md-full/articles/azure-resource-manager"      # absolute nix
-  file_path: "G:\\dev\\azuremd_done\\virtual-network"                                                   # absolute win
+  file_path: "G:\\dev\\azure-docs\\"                                                    # absolute win
   # file_path: "files/"                                                                 # relative
   max_workers: 48
 

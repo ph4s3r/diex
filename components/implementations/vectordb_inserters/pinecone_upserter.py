@@ -15,8 +15,8 @@ class PineConeUpserter(VectorInserter):
     ) -> None:
 
         self.api_key = "PINECONE_API_KEY_REMOVED"
-        self.index_host = "https://test-226a147.svc.aped-4627-b74a.pinecone.io"
-        self.index_name = "test"
+        self.index_name = "universe"
+        self.index_host = f"https://{self.index_name}-226a147.svc.aped-4627-b74a.pinecone.io"
         self.namespace = "ns1"
         self.logger = logging.getLogger('Inserter')
         
