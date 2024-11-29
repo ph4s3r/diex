@@ -1,5 +1,6 @@
 from components.interfaces.all_interfaces import DocumentSplitter
 
+from uuid import uuid3, NAMESPACE_DNS
 from typing import List
 from langchain_core.documents import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter, MarkdownHeaderTextSplitter
@@ -29,9 +30,9 @@ class MDSplitter(DocumentSplitter):
         for doc in documents:
             md_header_splits = markdown_splitter.split_text(doc.page_content)
             for split in md_header_splits:
+                last_header = split.page_content.split("\n")[0] # extract header
                 split.metadata = doc.metadata
-                last_header = split.page_content.split("\n")[0]  # Extract header line
-                
+
                 text_splitter = RecursiveCharacterTextSplitter(
                     chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap
                 )
@@ -39,6 +40,7 @@ class MDSplitter(DocumentSplitter):
                 # Attach header metadata to each chunk
                 for chunk in text_splitter.split_text(split.page_content):
                     chunk_doc = Document(
+                        id = str(uuid3(NAMESPACE_DNS, chunk)),
                         page_content=chunk, 
                         metadata={**split.metadata, "header": last_header}
                     )
