@@ -25,6 +25,10 @@ class PineConeUpserter(VectorInserter):
         self.index = self.pc.Index(host=self.index_host)
         self.logger.info(f"Established connection with index at host {self.index_host}, index name: {self.index_name}")
 
+    def _batchify(self, items: List[dict], batch_size: int):
+        for i in range(0, len(items), batch_size):
+            yield items[i:i + batch_size]
+
     def insert(self, documents: List[Document], vectors: Optional[List[List[float]]] = None) -> None:
 
         if vectors is None:
@@ -49,10 +53,16 @@ class PineConeUpserter(VectorInserter):
                 "metadata": d.metadata
             })
 
-        self.index.upsert(
-            vectors=embeddings,
-            namespace=self.namespace
-        )
+        # Split embeddings into batches
+        for batch_num, batch in enumerate(self._batchify(embeddings, self.MAX_BATCH_SIZE), start=1):
+            try:
+                self.index.upsert(
+                    vectors=batch,
+                    namespace=self.namespace
+                )
+                self.logger.info(f"Successfully upserted batch {batch_num} with {len(batch)} vectors.")
+            except Exception as e:
+                self.logger.error(f"Failed to upsert batch {batch_num}: {e}")
 
         self.logger.info("Successfully upserted the stuff YaYY! :)")
 
