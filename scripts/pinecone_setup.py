@@ -1,6 +1,6 @@
 # Replace with your Pinecone API key and environment
 API_KEY = "pcsk_r1c8Y_HvcdmYqVuYkhCLtjLYBTzGbDSYpJn3Mxf47SCkmXHBGUHLF2n6r9VcswV4gHzos"
-index_name = "test"
+index_name = "universe"
 cloud =  'aws'
 region = 'us-east-1'
 model_name = 'dunzhang/stella_en_1.5B_v5'
