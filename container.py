@@ -4,7 +4,7 @@ from components.implementations.document_loaders.pdf_loader import PDFLoader
 from components.implementations.document_splitters.splitter import MDSplitter
 from components.implementations.embedders.openai_embedder import OpenAIEmbedder
 from components.implementations.embedders.st_embedder import SentenceTransformerEmbedder
-from components.implementations.vectordb_inserters.chroma_inserter import ChromaDBRemoteInserter
+from components.implementations.vectordb_inserters.pinecone_upserter import PineConeUpserter
 from components.services.vector_indexer import VectorIndexer
 
 
@@ -33,28 +33,22 @@ class Container(containers.DeclarativeContainer):
         headers_to_split_on=config.splitter.headers_to_split_on
     )
 
-    # embedder = providers.Singleton(
-    #     SentenceTransformerEmbedder,
-    #     embedding_model=config.embedder.embedding_model
-    # )
-
     embedder = providers.Singleton(
-        OpenAIEmbedder,
-        model=config.embedder.embedding_model,
-        batch_size=config.embedder.openai.batch_size,
-        max_tokens_per_minute=config.embedder.openai.max_tokens_per_minute,
-        max_requests_per_minute=config.embedder.openai.max_requests_per_minute,
-        batch_queue_limit=config.embedder.openai.batch_queue_limit
+        SentenceTransformerEmbedder,
+        embedding_model=config.embedder.embedding_model
     )
 
+    # embedder = providers.Singleton(
+    #     OpenAIEmbedder,
+    #     model=config.embedder.embedding_model,
+    #     batch_size=config.embedder.openai.batch_size,
+    #     max_tokens_per_minute=config.embedder.openai.max_tokens_per_minute,
+    #     max_requests_per_minute=config.embedder.openai.max_requests_per_minute,
+    #     batch_queue_limit=config.embedder.openai.batch_queue_limit
+    # )
+
     vector_inserter = providers.Singleton(
-        ChromaDBRemoteInserter,
-        url=config.chroma.url,
-        port=config.chroma.port,
-        tenant=config.chroma.tenant,
-        database=config.chroma.database,
-        collection=config.chroma.collection,
-        embedding_model=config.embedder.embedding_model
+        PineConeUpserter
     )
 
     vector_indexer_service = providers.Singleton(
