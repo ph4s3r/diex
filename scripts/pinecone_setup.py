@@ -26,11 +26,12 @@ model_kwargs = {
     'trust_remote_code':True
     }
 
-query_prompt_name = 's2p_query'
+# this is for queries only!
+# query_prompt_name = 's2p_query'
 
 encode_kwargs = {
                     'normalize_embeddings': True,
-                    'prompt_name': query_prompt_name
+                    # 'prompt_name': query_prompt_name
 }
 
 embeddings = HuggingFaceEmbeddings(
