@@ -50,7 +50,7 @@ class MarkdownLoader(DocumentLoader):
             for doc in docs:
                 if doc:
                     # Retain source filename as metadata
-                    doc.metadata = {"source": str(md_file)}
+                    doc.metadata = {"source": str(md_file.stem)}
 
             return docs
 
