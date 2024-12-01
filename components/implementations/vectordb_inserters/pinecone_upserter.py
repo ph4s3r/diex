@@ -46,11 +46,14 @@ class PineConeUpserter(VectorInserter):
 
         embeddings = []
 
-        for d, e in zip(documents, vectors):
+        for doc, vec in zip(documents, vectors):
             embeddings.append({
-                "id": d.id,
-                "values": e,
-                "metadata": d.metadata
+                "id": doc.id,
+                "values": vec,
+                "metadata": {
+                    **doc.metadata,
+                    "content": doc.page_content  # Add the text content as metadata with the key "content"
+                }
             })
 
         # Split embeddings into batches
