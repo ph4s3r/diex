@@ -4,8 +4,8 @@ embedding_type: openai                # options: openai, other_embedding_service
 
 documentloader:
   # file_path: "/home/peet/dev/azure-docs-md-full/articles/azure-resource-manager"      # absolute nix
-  file_path: "G:\\dev\\azure-docs\\"                                                    # absolute win
-  # file_path: "files/"                                                                 # relative
+  # file_path: "G:\\dev\\azure-docs\\"                                                    # absolute win
+  file_path: "files/"                                                                 # relative
   max_workers: 48
 
 splitter:
@@ -33,3 +33,10 @@ chroma:
   tenant: default_tenant
   database: default_database
   collection: openai
+
+pinecone:
+
+  api_key = pcsk_r1c8Y_HvcdmYqVuYkhCLtjLYBTzGbDSYpJn3Mxf47SCkmXHBGUHLF2n6r9VcswV4gHzos
+  index_name = universe
+  index_host_suffix = 226a147.svc.aped-4627-b74a.pinecone.io
+  namespace = ns1
