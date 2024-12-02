@@ -46,22 +46,29 @@ class MarkdownLoader(DocumentLoader):
         Returns:
             Optional[List[Document]]: A list of Document objects if successful, else None.
         """
+
+        unstructured_kwargs = {
+            'strategy': 'fast'
+            }
+
         try:
             loader = UnstructuredMarkdownLoader(
                 str(md_file),
-                mode="single"  # one doc per markdown file
+                mode="single",  # one doc per markdown file
+                strategy="fast",
+                # unstructured_kwargs=unstructured_kwargs
             )
+
+            source = self.project + str(md_file.relative_to(self.file_path)).replace("\\", "/")
             docs: List[Document] = loader.load()
 
-            if not docs:
-                return None
+            docs[0].metadata = {"source": source}
 
-            for doc in docs:
-                if doc:
-                    source = self.project + str(md_file.relative_to(self.file_path)).replace("\\", "/")
-                    doc.metadata = {"source": source}
+            if len(docs) > 1:
+                print("LANGCHAIN!! WAT!")
+                os._exit(249)
 
-            return docs
+            return [docs[0]]
 
         except Exception as e:
             self.logger.error(f"Error loading {md_file}: {e}")
