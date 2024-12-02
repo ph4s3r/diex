@@ -3,11 +3,11 @@
 torch
 dependency_injector==4.43.0
 pinecone[grpc] # pip could not install it bcause of protobuf no good version, maybe in the beginning...
-langchain-openai==0.2.9
-langchain-core==0.3.19
-langchain-community==0.3.7
-unstructured==0.11.8
-markdown==3.7
+langchain-openai
+langchain-core
+langchain-community
+unstructured
+markdown
 # chromadb
 # chromadb-client==0.5.20
 # sentence transformers & utils
