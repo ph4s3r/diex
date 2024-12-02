@@ -6,7 +6,8 @@ pinecone[grpc] # pip could not install it bcause of protobuf no good version, ma
 langchain-openai
 langchain-core
 langchain-community
-unstructured
+unstructured[md]
+nltk
 markdown
 # chromadb
 # chromadb-client==0.5.20
