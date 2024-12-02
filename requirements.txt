@@ -1,14 +1,17 @@
 # latest stable releases at the time of writing
+--extra-index-url https://download.pytorch.org/whl/cu124
+torch
 dependency_injector==4.43.0
+pinecone[grpc] # pip could not install it bcause of protobuf no good version, maybe in the beginning...
 langchain-openai==0.2.9
 langchain-core==0.3.19
 langchain-community==0.3.7
 unstructured==0.11.8
 markdown==3.7
 # chromadb
-chromadb-client==0.5.20
+# chromadb-client==0.5.20
 # sentence transformers & utils
 sentence-transformers==3.3.1
 datasets
 einops
-nvitop # my fav nvi monitor
+# nvitop # my fav nvi monitor
