@@ -40,15 +40,20 @@ class SentenceTransformerEmbedder(Embedder):
             self.logger.error("No documents provided for embedding.")
             os._exit(199)
 
-        dox = [doc.page_content for doc in documents]
+        batch_size = 2500
+        embedding_vectors = list()
 
-        def add_eos(input_examples):
-            input_examples = [input_example + self.model.tokenizer.eos_token for input_example in input_examples]
-            return input_examples
-        
-        embeddings_nparray = self.model.encode(dox)
-        self.logger.info(f"docs embedded successfully, embeddings type: {type(embeddings_nparray)} shape: {embeddings_nparray.shape}")
-        embedding_vectors = embeddings_nparray.tolist()
+        batches = (len(documents) // batch_size) + 1
+            
+        for i in range(batches):
+            range_start = i*batch_size
+            range_end = i*batch_size+batch_size
+
+            dox = [doc.page_content for doc in documents[range_start:range_end]]
+            
+            embeddings_nparray = self.model.encode(dox)
+            self.logger.info(f"docs embedded successfully, embeddings type: {type(embeddings_nparray)} shape: {embeddings_nparray.shape}")
+            embedding_vectors.extend(embeddings_nparray.tolist())
 
         return embedding_vectors
 
