@@ -30,7 +30,7 @@ class MarkdownLoader(DocumentLoader):
         """
         self.file_path: Path = Path(file_path).resolve()
         self.logger: logging.Logger = logging.getLogger('DocumentLoader')
-        self.max_workers: int = max_workers or (os.cpu_count() * 5 if os.cpu_count() else 10)
+        self.max_workers = max_workers or (os.cpu_count() * 10 if os.cpu_count() else 24)
         if project[-1] == "/" or project[-1] == "\\":
             self.project = project
         else:

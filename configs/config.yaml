@@ -6,12 +6,12 @@ documentloader:
   # file_path: "/home/peet/dev/azure-docs-md/"            # absolute nix
   file_path: "G:\\dev\\azure-docs\\"                    # absolute win
   # file_path: "files/"                                     # relative
-  max_workers: 48
+  max_workers: 140
   project: https://github.com/MicrosoftDocs/azure-docs/    # we generate a source metadata from project+location
 
 splitter:
-  chunk_size: 750
-  chunk_overlap: 100
+  chunk_size: 1000
+  chunk_overlap: 200
   headers_to_split_on:
     - ["#", "Header 1"]
     - ["##", "Header 2"]
@@ -39,4 +39,4 @@ pinecone:
   api_key: PINECONE_API_KEY_REMOVED
   index_name: universe
   index_host_suffix: 226a147.svc.aped-4627-b74a.pinecone.io
-  namespace: nstest
+  namespace: tests
