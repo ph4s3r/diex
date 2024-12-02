@@ -4,12 +4,13 @@ import time
 import logging
 from typing import List, Optional
 from pinecone.grpc import PineconeGRPC as Pinecone
+# from pinecone import Pinecone
 from langchain_core.documents import Document
 
 
 class PineConeUpserter(VectorInserter):
 
-    MAX_BATCH_SIZE = 500
+    MAX_BATCH_SIZE = 300
 
     def __init__(self,
                  api_key,
