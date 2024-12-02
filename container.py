@@ -18,11 +18,13 @@ class Container(containers.DeclarativeContainer):
         markdown=providers.Singleton(
             MarkdownLoader,
             file_path=config.documentloader.file_path,
-            max_workers=config.documentloader.max_workers
+            max_workers=config.documentloader.max_workers,
+            project=config.documentloader.project
         ),
         pdf=providers.Singleton(
             PDFLoader,
-            file_path=config.documentloader.file_path  # Assuming similar updates
+            file_path=config.documentloader.file_path,
+            project=config.documentloader.project
         )
     )
     
@@ -48,7 +50,11 @@ class Container(containers.DeclarativeContainer):
     # )
 
     vector_inserter = providers.Singleton(
-        PineConeUpserter
+        PineConeUpserter,
+        api_key=config.pinecone.api_key,
+        index_name=config.pinecone.index_name,
+        index_host_suffix=config.pinecone.index_host_suffix,
+        namespace=config.pinecone.namespace,
     )
 
     vector_indexer_service = providers.Singleton(

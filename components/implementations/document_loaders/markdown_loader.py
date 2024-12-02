@@ -11,7 +11,12 @@ from tqdm import tqdm  # For progress bar
 
 
 class MarkdownLoader(DocumentLoader):
-    def __init__(self, file_path: str, max_workers: Optional[int] = None) -> None:
+    def __init__(
+            self, 
+            file_path: str, 
+            max_workers: Optional[int] = None, 
+            project: str = None
+            ) -> None:
         """
         Initializes the MarkdownLoader with a directory path and optional max_workers for parallel loading.
         https://python.langchain.com/api_reference/core/documents/langchain_core.documents.base.Document.html#langchain_core.documents.base.Document
@@ -26,6 +31,10 @@ class MarkdownLoader(DocumentLoader):
         self.file_path: Path = Path(file_path).resolve()
         self.logger: logging.Logger = logging.getLogger('DocumentLoader')
         self.max_workers: int = max_workers or (os.cpu_count() * 5 if os.cpu_count() else 10)
+        if project[-1] == "/" or project[-1] == "\\":
+            self.project = project
+        else:
+            self.project = project + "\\"
 
     def _load_single_file(self, md_file: Path) -> Optional[List[Document]]:
         """
@@ -49,8 +58,8 @@ class MarkdownLoader(DocumentLoader):
 
             for doc in docs:
                 if doc:
-                    # Retain source filename as metadata
-                    doc.metadata = {"source": str(md_file.stem)}
+                    source = self.project + str(md_file.relative_to(self.file_path)).replace("\\", "/")
+                    doc.metadata = {"source": source}
 
             return docs
 
