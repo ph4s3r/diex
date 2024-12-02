@@ -3,7 +3,7 @@ from components.interfaces.all_interfaces import VectorInserter
 import time
 import logging
 from typing import List, Optional
-from pinecone import Pinecone
+from pinecone.grpc import PineconeGRPC as Pinecone
 from langchain_core.documents import Document
 
 
@@ -11,16 +11,21 @@ class PineConeUpserter(VectorInserter):
 
     MAX_BATCH_SIZE = 500
 
-    def __init__(self
+    def __init__(self,
+                 api_key,
+                 index_name,
+                 namespace,
+                 index_host_suffix
+
     ) -> None:
 
-        self.api_key = "pcsk_r1c8Y_HvcdmYqVuYkhCLtjLYBTzGbDSYpJn3Mxf47SCkmXHBGUHLF2n6r9VcswV4gHzos"
-        self.index_name = "universe"
-        self.index_host = f"https://{self.index_name}-226a147.svc.aped-4627-b74a.pinecone.io"
-        self.namespace = "ns1"
+        self.api_key = api_key
+        self.index_name = index_name
+        self.namespace = namespace
+        
+        self.index_host = f"https://{index_name}-{index_host_suffix}"
         self.logger = logging.getLogger('Inserter')
         
-
         self.pc = Pinecone(api_key=self.api_key)
         self.index = self.pc.Index(host=self.index_host)
         self.logger.info(f"Established connection with index at host {self.index_host}, index name: {self.index_name}")

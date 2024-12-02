@@ -1,12 +1,13 @@
-file_type: markdown                   # options: markdown, pdf, txt
-embedding_type: openai                # options: openai, other_embedding_service
+file_type: markdown                                       # options: markdown, pdf, txt
+embedding_type: openai                                    # options: openai, other_embedding_service
 
 
 documentloader:
-  # file_path: "/home/peet/dev/azure-docs-md-full/articles/azure-resource-manager"      # absolute nix
-  # file_path: "G:\\dev\\azure-docs\\"                                                    # absolute win
-  file_path: "files/"                                                                 # relative
+  # file_path: "/home/peet/dev/azure-docs-md/"            # absolute nix
+  file_path: "G:\\dev\\azure-docs\\"                    # absolute win
+  # file_path: "files/"                                     # relative
   max_workers: 48
+  project: https://github.com/MicrosoftDocs/azure-docs/    # we generate a source metadata from project+location
 
 splitter:
   chunk_size: 750
@@ -17,13 +18,13 @@ splitter:
     - ["###", "Header 3"]
 
 embedder:
-  # embedding_model: "text-embedding-3-small"          #options: https://platform.openai.com/docs/guides/embeddings/
+  # embedding_model: "text-embedding-3-small"             #options: https://platform.openai.com/docs/guides/embeddings/
   embedding_model: "dunzhang/stella_en_1.5B_v5" 
   openai:
     batch_size: 2048
-    max_tokens_per_minute: 150000             # TPM: error: on tokens per min (TPM): Limit 150000, Requested 172752. 
-    max_requests_per_minute: 3000             # RPM: 3,000 
-    batch_queue_limit: 3000000                # Batch Queue Limit: 3,000,000
+    max_tokens_per_minute: 150000                         # TPM: error: on tokens per min (TPM): Limit 150000, Requested 172752. 
+    max_requests_per_minute: 3000                         # RPM: 3,000 
+    batch_queue_limit: 3000000                            # Batch Queue Limit: 3,000,000
   sentencetransformer:
     batch_size: 2
 
@@ -35,8 +36,7 @@ chroma:
   collection: openai
 
 pinecone:
-
-  api_key = pcsk_r1c8Y_HvcdmYqVuYkhCLtjLYBTzGbDSYpJn3Mxf47SCkmXHBGUHLF2n6r9VcswV4gHzos
-  index_name = universe
-  index_host_suffix = 226a147.svc.aped-4627-b74a.pinecone.io
-  namespace = ns1
+  api_key: pcsk_r1c8Y_HvcdmYqVuYkhCLtjLYBTzGbDSYpJn3Mxf47SCkmXHBGUHLF2n6r9VcswV4gHzos
+  index_name: universe
+  index_host_suffix: 226a147.svc.aped-4627-b74a.pinecone.io
+  namespace: nstest
