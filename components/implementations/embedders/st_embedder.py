@@ -57,7 +57,8 @@ class SentenceTransformerEmbedder(Embedder):
             del embeddings_nparray
             del dox
             torch.cuda.empty_cache()
-        self.logger.info(f"docs embedded successfully, embeddings type: {type(embedding_vectors)} shape: {embedding_vectors.shape}")
+        
+        self.logger.info(f"docs embedded successfully, embeddings type: {type(embedding_vectors)}")
         return embedding_vectors
 
 
