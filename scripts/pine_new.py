@@ -13,7 +13,7 @@ class PineConeClient():
     ) -> None:
 
         self.max_batch_size = 100
-        self.api_key = "pcsk_r1c8Y_HvcdmYqVuYkhCLtjLYBTzGbDSYpJn3Mxf47SCkmXHBGUHLF2n6r9VcswV4gHzos" #os.getenv("PINECONE_API_KEY")
+        self.api_key = os.getenv("PINECONE_API_KEY")
         self.index_name = "universe"
         self.index_host = f"https://{self.index_name}-226a147.svc.aped-4627-b74a.pinecone.io"
         self.namespace = "tests"

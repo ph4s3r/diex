@@ -37,7 +37,6 @@ chroma:
   collection: openai
 
 pinecone:
-  api_key: pcsk_r1c8Y_HvcdmYqVuYkhCLtjLYBTzGbDSYpJn3Mxf47SCkmXHBGUHLF2n6r9VcswV4gHzos
   index_name: universe
   index_host_suffix: 226a147.svc.aped-4627-b74a.pinecone.io
   namespace: tests

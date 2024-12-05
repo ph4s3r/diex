@@ -1,5 +1,7 @@
 # Replace with your Pinecone API key and environment
-API_KEY = "pcsk_r1c8Y_HvcdmYqVuYkhCLtjLYBTzGbDSYpJn3Mxf47SCkmXHBGUHLF2n6r9VcswV4gHzos"
+import os
+
+API_KEY = os.getenv("PINECONE_API_KEY")
 index_name = "universe"
 cloud =  'aws'
 region = 'us-east-1'
