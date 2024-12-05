@@ -24,19 +24,16 @@ class ColorFormatter(logging.Formatter):
         return super().format(record)
 
 def setup_logging(logs_dir: Path = Path('logs')):
-    # Generate folder name based on current datetime
+
     run_dt = datetime.now().strftime('%b%d-%H%M').lower()
     run_dir = logs_dir / run_dt
 
-    # Ensure the run directory exists
     run_dir.mkdir(parents=True, exist_ok=True)
 
-    # Log formats
     log_format = '%(asctime)s %(name)s %(levelname)s %(message)s'
     file_formatter = logging.Formatter(log_format)  # Plain formatter for files
     console_formatter = ColorFormatter(log_format)  # Colorized formatter for stdout
 
-    # Main logger setup
     main_logger = logging.getLogger('main')
     main_logger.setLevel(logging.INFO)
 

@@ -4,8 +4,6 @@
 
 We actively welcome your pull requests.
 
-If you're new, we encourage you to take a look at issues tagged with [good first issue](https://github.com/pytorch/examples/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
-
 ### For new components
 
 - implement it based on its interface spec, should be a separate file in the implementations folder
