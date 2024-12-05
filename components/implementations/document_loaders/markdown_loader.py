@@ -1,13 +1,15 @@
 from components.interfaces.all_interfaces import DocumentLoader
 
+import os
 import logging
-from typing import List, Optional
+from tqdm import tqdm
 from pathlib import Path
+from typing import List, Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from langchain_core.documents import Document
 from langchain_community.document_loaders import UnstructuredMarkdownLoader
-import os  # for cpu_count()
-from tqdm import tqdm  # For progress bar
+
+
 
 
 class MarkdownLoader(DocumentLoader):

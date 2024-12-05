@@ -19,7 +19,8 @@ splitter:
 
 embedder:
   # embedding_model: "text-embedding-3-small"             #options: https://platform.openai.com/docs/guides/embeddings/
-  embedding_model: "dunzhang/stella_en_1.5B_v5" 
+  embedding_model: "dunzhang/stella_en_1.5B_v5"
+  batch_size: 6000 
   openai:
     batch_size: 2048
     max_tokens_per_minute: 150000                         # TPM: error: on tokens per min (TPM): Limit 150000, Requested 172752. 

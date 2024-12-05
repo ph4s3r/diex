@@ -40,6 +40,7 @@ class SentenceTransformerEmbedder(Embedder):
             self.logger.error("No documents provided for embedding.")
             os._exit(199)
 
+        # TODO: to config (this is how much the 4080 can manage)
         batch_size = 6000
         embedding_vectors = list()
 
