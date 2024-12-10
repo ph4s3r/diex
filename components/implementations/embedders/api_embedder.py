@@ -24,7 +24,9 @@ class GeneralEmbeddingAPIClient(Embedder):
         all_vectors = []
 
         for doc in documents:
-            all_vectors.append(self.embed_query(doc.page_content))
+            vec = self.embed_query(doc.page_content)
+            if vec is not None:
+                all_vectors.append(vec)
 
         return all_vectors
 
