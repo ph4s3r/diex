@@ -1,5 +1,6 @@
 from dependency_injector import containers, providers
-from components.implementations.document_loaders.markdown_loader import MarkdownLoader
+# from components.implementations.document_loaders.markdown_loader import MarkdownLoader
+from components.implementations.document_loaders.Unstructuredmdloader import UnstructuredMDLoader
 from components.implementations.document_loaders.pdf_loader import PDFLoader
 # from components.implementations.document_splitters.splitter import MDSplitter
 from components.implementations.document_splitters.TransformersSplitter import TransformersSplitter
@@ -17,7 +18,7 @@ class Container(containers.DeclarativeContainer):
     document_loader = providers.Selector(
         config.file_type,
         markdown=providers.Singleton(
-            MarkdownLoader,
+            UnstructuredMDLoader,
             file_path=config.documentloader.file_path,
             max_workers=config.documentloader.max_workers,
             project=config.documentloader.project
