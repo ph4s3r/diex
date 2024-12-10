@@ -1,7 +1,8 @@
 from dependency_injector import containers, providers
 from components.implementations.document_loaders.markdown_loader import MarkdownLoader
 from components.implementations.document_loaders.pdf_loader import PDFLoader
-from components.implementations.document_splitters.splitter import MDSplitter
+# from components.implementations.document_splitters.splitter import MDSplitter
+from components.implementations.document_splitters.TransformersSplitter import TransformersSplitter
 from components.implementations.embedders.api_embedder import GeneralEmbeddingAPIClient
 # from components.implementations.embedders.st_embedder import SentenceTransformerEmbedder
 from components.implementations.vectordb_inserters.pinecone_upserter import PineConeUpserter
@@ -29,9 +30,9 @@ class Container(containers.DeclarativeContainer):
     )
     
     document_splitter = providers.Singleton(
-        MDSplitter,
-        chunk_size=config.splitter.chunk_size,
-        chunk_overlap=config.splitter.chunk_overlap,
+        TransformersSplitter,
+        max_token_seq_len=config.splitter.tokensplitter.max_token_seq_len,
+        token_overlap=config.splitter.tokensplitter.token_overlap,
         headers_to_split_on=config.splitter.headers_to_split_on
     )
 

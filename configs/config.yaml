@@ -4,14 +4,15 @@ embedding_type: openai                                    # options: openai, oth
 
 documentloader:
   # file_path: "/home/peet/dev/azure-docs-md/"            # absolute nix
-  # file_path: "G:\\dev\\azure-docs\\"                    # absolute win
-  file_path: "files/"                                     # relative
+  file_path: "G:\\dev\\azure-docs\\"                      # absolute win
+  # file_path: "files/"                                     # relative
   max_workers: 140
   project: https://github.com/MicrosoftDocs/azure-docs/    # we generate a source metadata from project+location
 
 splitter:
-  chunk_size: 1000
-  chunk_overlap: 200
+  tokensplitter:
+    max_token_seq_len: 400
+    token_overlap: 100
   headers_to_split_on:
     - ["#", "Header 1"]
     - ["##", "Header 2"]
@@ -42,4 +43,4 @@ embedder:
 pinecone:
   index_name: discovery
   index_host_suffix: 226a147.svc.aped-4627-b74a.pinecone.io
-  namespace: tests
+  namespace: microsoft
