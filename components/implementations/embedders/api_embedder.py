@@ -36,16 +36,16 @@ class GeneralEmbeddingAPIClient(Embedder):
             self.logger.error("No query provided for embedding.")
             return None
 
-        url = f"http://{self.host}:{self.port}/embed"
+        url = f"http://{self.host}:{self.port}/embed_query"
         headers = {'Content-Type': 'application/json'}
-        payload = {"inputs": query}
+        payload = {"text": query}
 
         try:
             
             response = requests.post(url, json=payload, headers=headers)
         
             if response.status_code == 200:
-                return response.json()[0]
+                return response.json()
             else:
                 self.logger.error(f"Error: Received status code {response.status_code}. Response: {response.text}")
                 return None

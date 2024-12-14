@@ -32,14 +32,15 @@ class TransformersSplitter(DocumentSplitter):
             # Attach header metadata to each chunk
             for i, chunk in enumerate(self.text_splitter.split_text(doc.page_content)):
                 input_data = self.tokenizer(chunk, padding="longest", truncation=True, max_length=self.max_token_seq_len, return_tensors="pt")
+                self.logger.debug(f"char len of chunk is {len(doc.page_content)}")
+                self.logger.debug(f"seq len of chunk is {len(input_data.encodings[0].tokens)}")
                 if input_data.n_sequences > 1:
-                    print("need to split here!")
+                    print("would need to split here!")
                 chunk_doc = Document(
                     id = str(uuid3(NAMESPACE_DNS, chunk)),
                     page_content=chunk, 
                     metadata=doc.metadata
                 )
                 all_chunks.append(chunk_doc)
-        self.logger.info(f"The md split is split to {i} chunks.")
 
         return all_chunks

@@ -28,5 +28,5 @@ class Embedder(ABC):
 class VectorInserter(ABC):
     @abstractmethod
     # insert vector embeddings to a vector database
-    def insert(self, documents: List[Document], vectors: Optional[List[List[float]]])-> None:
+    def insert(self, documents: List[Document], vectors: List[List[float]])-> None:
         pass
