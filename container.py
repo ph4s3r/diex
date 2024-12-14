@@ -21,7 +21,8 @@ class Container(containers.DeclarativeContainer):
             UnstructuredMDLoader,
             file_path=config.documentloader.file_path,
             max_workers=config.documentloader.max_workers,
-            project=config.documentloader.project
+            project=config.documentloader.project,
+            version=config.documentloader.version
         ),
         pdf=providers.Singleton(
             PDFLoader,
@@ -33,8 +34,7 @@ class Container(containers.DeclarativeContainer):
     document_splitter = providers.Singleton(
         TransformersSplitter,
         max_token_seq_len=config.splitter.tokensplitter.max_token_seq_len,
-        token_overlap=config.splitter.tokensplitter.token_overlap,
-        headers_to_split_on=config.splitter.headers_to_split_on
+        token_overlap=config.splitter.tokensplitter.token_overlap
     )
 
     # embedder = providers.Singleton(
