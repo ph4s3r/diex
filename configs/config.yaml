@@ -19,7 +19,7 @@ splitter:
 embedder:
   embedderapi:
     host: localhost
-    port: 8080
+    port: 80
   # embedding_model: "text-embedding-3-small"             #options: https://platform.openai.com/docs/guides/embeddings/
   embedding_model: "dunzhang/stella_en_1.5B_v5"
   batch_size: 6000 
@@ -41,4 +41,4 @@ embedder:
 pinecone:
   index_name: discovery
   index_host_suffix: 226a147.svc.aped-4627-b74a.pinecone.io
-  namespace: microsoft
+  namespace: newvnettest

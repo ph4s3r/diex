@@ -2,7 +2,7 @@ from components.interfaces.all_interfaces import VectorInserter
 
 import time
 import logging
-from typing import List, Optional
+from typing import List
 from pinecone.grpc import PineconeGRPC as Pinecone
 # from pinecone import Pinecone
 from langchain_core.documents import Document
@@ -35,7 +35,7 @@ class PineConeUpserter(VectorInserter):
         for i in range(0, len(items), batch_size):
             yield items[i:i + batch_size]
 
-    def insert(self, documents: List[Document], vectors: Optional[List[List[float]]] = None) -> None:
+    def insert(self, documents: List[Document], vectors: List[List[float]] = None) -> None:
 
         if vectors is None:
             self.logger.error(f"No vectors received by PineCone Upserter, returning.")
@@ -53,13 +53,12 @@ class PineConeUpserter(VectorInserter):
         embeddings = []
 
         for doc, vec in zip(documents, vectors):
+            meta = doc.metadata
+            meta.update({"content": doc.page_content})
             embeddings.append({
                 "id": doc.id,
                 "values": vec,
-                "metadata": {
-                    **doc.metadata,
-                    "content": doc.page_content  # Add the text content as metadata with the key "content"
-                }
+                "metadata": meta
             })
 
         # Split embeddings into batches

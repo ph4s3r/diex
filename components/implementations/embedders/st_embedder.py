@@ -27,8 +27,8 @@ class SentenceTransformerEmbedder(Embedder):
         try:
             self.model = SentenceTransformer(self.embedding_model, trust_remote_code=True, device="cuda")
             self.logger.info(f"{self.embedding_model} loaded successfully.")
-            self.logger.info("Max Sequence Length:", self.model.max_seq_length, "changing it to 512")
-            self.model.max_seq_length = 512
+            self.logger.info("Max Sequence Length:", self.model.max_seq_length, "changing it to 768")
+            self.model.max_seq_length = 768
 
         except Exception as e:
             self.logger.error(f"Failed to load {self.embedding_model} model: {e}")
