@@ -1,9 +1,9 @@
 # NEXT PLANNED FEATURES
 
-- use Unstructured for all files 
-- is there a way to install a requirement only when we use that particular module? maybe someone implements something but it should not be necessarily a part of the whole image / solution 
 - streamline the whole pipeline with queues / factory / serialization
+- look into generating vectors from the metadata added (otherwise we should do some non-vector search based on the metadata)
 
 # PROBLEMS
 
-- the file.read in the unstructured markdown loader already converts the md header hashtags to some other characters. maybe there is no information lost, but the split by headers is I guess already not working... we cannot build a nice metadata hierarchy based structure... the metadata is currently the header of these azure docs like title authors topic etc...
+- there is a bug in unstructured, maybe not a big one - see the loader python file
+- is it possible that we don't need the splitter ? the mdloader has a 5k char limit and it seems like it is never more than the seq length (it was before!)

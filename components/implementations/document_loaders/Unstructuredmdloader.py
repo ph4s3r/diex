@@ -1,16 +1,18 @@
 from components.interfaces.all_interfaces import DocumentLoader
 
+import re
 import logging
+import pprint
 from pathlib import Path
+from termcolor import cprint
 from typing import List, Optional
 from langchain_core.documents import Document
 from unstructured.partition.md import partition_md
 from unstructured.chunking.title import chunk_by_title
 from unstructured.staging.base import elements_from_base64_gzipped_json
-from termcolor import cprint
 from langchain_core.documents import Document
-import re
-import pprint
+
+
 
 
 class UnstructuredMDLoader(DocumentLoader):
@@ -37,6 +39,7 @@ class UnstructuredMDLoader(DocumentLoader):
         self.file_path: Path = Path(file_path).resolve()
         self.logger: logging.Logger = logging.getLogger('DocumentLoader')
         self.debug = False
+
 
     def load(self) -> List[Document]:
         """
@@ -65,7 +68,8 @@ class UnstructuredMDLoader(DocumentLoader):
 
         for mdfile in markdown_files:
             mdelements = self._unstruct_partition_single_md(mdfile)
-            docs.extend(mdelements) # lehet extend kell
+            if mdelements is not None:
+                docs.extend(mdelements) # lehet extend kell
         return docs
     
     def _text_to_kv(self, input_string):
@@ -97,27 +101,38 @@ class UnstructuredMDLoader(DocumentLoader):
 
         md_meta = {} # all the custom metadata we gather manually from the docs
         md_meta["source"] = self.project + self.version + str(md_file.relative_to(self.file_path.parent.parent)).replace("\\", "/")
-
-        elements = partition_md(
-            filename=md_file
-            )
-        
-        md_h_list = [""] * 6 # markdown headers have a max depth of 6
-
-        # all microsoft learn docs start with a special header, we process these 3 first elements automatically
-        if any(substring in self.project for substring in ["azure", "microsoft"]):           
+        try:
+            elements = partition_md(
+                filename=md_file
+                )
+        except Exception as e:
+            self.logger.error(f"Skipping processing markdown file of {md_meta["source"]}: {e}")
+            return None
+        # all microsoft learn docs start with a special header, we try to process these 3 first elements automatically
+        if any(substring in self.project for substring in ["azure", "microsoft"]) and "includes" not in md_meta["source"]:           
             try:
-                md_meta.update(self._text_to_kv(elements.pop(0).text))
-                try:
-                    md_meta["intent"] = elements.pop(0).text.split(":")[1:][0]
-                except (IndexError, AttributeError):
-                    try:
-                        md_meta["intent"] = elements.pop(0).text
-                    except:
-                        raise Exception("Could not process intent, we skip then the header processing")
-                md_meta["main_header"] = elements.pop(0).text
+                msheaders = self._text_to_kv(elements[0].text)
+                elements.pop(0).text
+                md_meta.update(msheaders)
             except Exception as e:
-                self.logger.warning(f"Skipping processing Microsoft markdown header of {self.file_path}: {e}")
+                self.logger.warning(f"Skipping processing Microsoft markdown header of {md_meta["source"]}: {e}")
+            if "intent" in elements[0].text and elements[0].category == "Title":
+                try:
+                    intent = elements[0].text.split(":")[1:][0]
+                    md_meta["intent"] = intent
+                    elements.pop(0)
+                # then try another way
+                except:
+                    try:
+                        md_meta["intent"] = elements[0].text
+                        elements.pop(0)
+                    except Exception as e:
+                        self.logger.warning(f"Could not process intent, we skip then the header processing, {e}")
+                    
+            # no intent doc, lets try with processing the first header if there is no intent
+            if elements[0].category == "Title":
+                md_meta["main_header"] = elements.pop(0).text
+
         
         chunks = chunk_by_title(
             elements, 
@@ -126,14 +141,17 @@ class UnstructuredMDLoader(DocumentLoader):
             max_characters=5000
             )
         
-        cprint(f"created {len(chunks)} chunks from {md_meta["source"]}", "cyan")
+        self.logger.debug(f"created {len(chunks)} chunks from {md_meta["source"]}", "cyan")
 
-        md_h_list[0] = md_meta.get("main_header", "")
         for chunk in chunks:
+            md_h_list = [""] * 6 # markdown headers have a max depth of 6
+            md_h_list[0] = md_meta.get("main_header", "")
+            chunk_meta = md_meta
             chunk_inmeta = chunk.metadata.to_dict()
             orig_elements = elements_from_base64_gzipped_json(chunk_inmeta["orig_elements"])
             # standalone header 
-            # len(orig_elements[0].text) > 5 BUG!!!!!!!!!!!!!!!!!!!!!!!!!!
+            # len(orig_elements[0].text) > 5 BUG!!! :
+            # unstructured sometimes classifies a few standalone words or just a random line as a title, while our mechanism here relies on the promised title based splitting...
             if len(orig_elements) == 1 and orig_elements[0].category == 'Title' and len(orig_elements[0].text) > 5:
                 # will jnot be saved as a separate chunk / vector - we just save it as a header (metadata)
                 depth = orig_elements[0].metadata.category_depth
@@ -142,17 +160,23 @@ class UnstructuredMDLoader(DocumentLoader):
                 md_h_list[orig_elements[0].metadata.category_depth] = orig_elements[0].text
                 self.logger.debug(f"Standalone chunk: {orig_elements[0].text}")
             else:
-                chunk_meta = md_meta
                 # all the markdown headers have a category depth = no. of hashtags - 1 - load them into the chunk meta
                 for elem in orig_elements:
                     if elem.category == 'Title':
                         depth = elem.metadata.category_depth
                         md_h_list[depth:] = [""] * (len(md_h_list) - depth)
                         md_h_list[elem.metadata.category_depth] = elem.text
+                # remove empty headers
+                while len(md_h_list) > 0:
+                    if md_h_list[-1] == "":
+                        md_h_list.pop()
+                    else:
+                        break
                 chunk_meta.pop('author', None)
                 chunk_meta.pop('ms.author', None)
-                markdown_header_struct_dict = {f"header_{i}": value for i, value in enumerate(md_h_list)}
-                chunk_meta.update(markdown_header_struct_dict)
+                if len(md_h_list) > 0:
+                    markdown_header_struct_dict = {f"header_{i}": value for i, value in enumerate(md_h_list)}
+                    chunk_meta.update(markdown_header_struct_dict)
                 result_document_list.append(Document(
                     page_content=str(chunk),
                     metadata=chunk_meta
