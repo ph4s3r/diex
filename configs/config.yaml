@@ -1,14 +1,14 @@
-file_type: markdown                                       # options: markdown, pdf, txt
-embedding_type: openai                                    # options: openai, other_embedding_service
+file_type: markdown                                             # options: markdown, pdf, txt
+embedding_type: openai                                          # options: openai, other_embedding_service
 
 
 documentloader:
-  # file_path: "/home/peet/dev/azure-docs-md/"            # absolute nix
-  file_path: "G:\\dev\\azure-docs\\"                      # absolute win
-  # file_path: "files/"                                     # relative
+  # file_path: "/home/peet/dev/azure-docs-md/"                  # absolute nix
+  file_path: "G:\\dev\\azure-docs\\articles\\virtual-network"   # absolute win
+  # file_path: "files/"                                         # relative
   # file_path: 'G:\\dev\\azure-docs\\articles\\deployment-environments\\'
   max_workers: 140
-  project: https://github.com/MicrosoftDocs/azure-docs/    # we generate a source metadata from project+location
+  project: https://github.com/MicrosoftDocs/azure-docs/         # we generate a source metadata from project+location
   version: "tree/main/"
 
 splitter:
@@ -19,8 +19,11 @@ splitter:
 embedder:
   embedderapi:
     host: localhost
-    port: 80
-  # embedding_model: "text-embedding-3-small"             #options: https://platform.openai.com/docs/guides/embeddings/
+    port: 3001
+    endpoint: embed
+    inputs_arg: inputs
+    
+  # embedding_model: "text-embedding-3-small"                   #options: https://platform.openai.com/docs/guides/embeddings/
   embedding_model: "dunzhang/stella_en_1.5B_v5"
   batch_size: 6000 
   openai:
@@ -41,4 +44,4 @@ embedder:
 pinecone:
   index_name: discovery
   index_host_suffix: 226a147.svc.aped-4627-b74a.pinecone.io
-  namespace: sanyi
+  namespace: azuredocs

@@ -10,17 +10,20 @@ class GeneralEmbeddingAPIClient(Embedder):
     def __init__(
         self,
         host: str, 
-        port: int
+        port: int,
+        endpoint: str,
+        inputs_arg: str
     ):
-
         self.host = host
         self.port = port
+        self.endpoint = endpoint
+        self.inputs_arg = inputs_arg
 
         # Configure logger
         self.logger = logging.getLogger('Embedder')
 
     def embed(self, documents: List["Document"]) -> List[List[float]]:
-        self.logger.info("Embedding starts")
+        self.logger.info(f"Embedding starts. Server (host:port/endpoint): {self.host}:{self.port}/{self.endpoint}")
         all_vectors = []
 
         for doc in documents:
@@ -36,9 +39,9 @@ class GeneralEmbeddingAPIClient(Embedder):
             self.logger.error("No query provided for embedding.")
             return None
 
-        url = f"http://{self.host}:{self.port}/embed_query"
+        url = f"http://{self.host}:{self.port}/{self.endpoint}"
         headers = {'Content-Type': 'application/json'}
-        payload = {"text": query}
+        payload = {self.inputs_arg: query}
 
         try:
             

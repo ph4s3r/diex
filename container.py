@@ -1,11 +1,9 @@
 from dependency_injector import containers, providers
-# from components.implementations.document_loaders.markdown_loader import MarkdownLoader
 from components.implementations.document_loaders.Unstructuredmdloader import UnstructuredMDLoader
 from components.implementations.document_loaders.pdf_loader import PDFLoader
-# from components.implementations.document_splitters.splitter import MDSplitter
 from components.implementations.document_splitters.TransformersSplitter import TransformersSplitter
 from components.implementations.embedders.api_embedder import GeneralEmbeddingAPIClient
-# from components.implementations.embedders.st_embedder import SentenceTransformerEmbedder
+from components.implementations.embedders.st_embedder import SentenceTransformerEmbedder
 from components.implementations.vectordb_inserters.pinecone_upserter import PineConeUpserter
 from components.services.vector_indexer import VectorIndexer
 
@@ -45,7 +43,9 @@ class Container(containers.DeclarativeContainer):
     embedder = providers.Singleton(
         GeneralEmbeddingAPIClient,
         host=config.embedder.embedderapi.host,
-        port=config.embedder.embedderapi.port
+        port=config.embedder.embedderapi.port,
+        endpoint=config.embedder.embedderapi.endpoint,
+        inputs_arg=config.embedder.embedderapi.inputs_arg
     )
 
     # embedder = providers.Singleton(
