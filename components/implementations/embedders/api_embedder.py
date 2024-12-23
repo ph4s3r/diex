@@ -11,12 +11,8 @@ class EmbedderAPIError(Exception):
     """Custom exception for embedder API-related errors."""
     pass
 
-
 def validate_vector(vec, logger):
     try:
-        if vec is None:
-            raise EmbedderAPIError("No vector received from embedder API. Please review.")
-
         if not isinstance(vec, list):
             raise EmbedderAPIError("Non-list vector format received from embedder API. Please review.")
         
@@ -49,12 +45,12 @@ class GeneralEmbeddingAPIClient(Embedder):
 
         for doc in documents:
             vec = self.embed_query(doc.page_content)
-
-            try:
-                validate_vector(vec, self.logger)
-                all_vectors.append(vec[0])
-            except EmbedderAPIError:
-                sys.exit(100)           
+            if vec is not None: # e.g. we get http 413 when the seq len is exceeded, no problem
+                try:
+                    validate_vector(vec, self.logger)
+                    all_vectors.append(vec[0])
+                except EmbedderAPIError:
+                    sys.exit(100)           
 
         return all_vectors
 
