@@ -1,10 +1,31 @@
 from components.interfaces.all_interfaces import Embedder
 
+import sys
 import logging
 import requests
 from typing import List
 from langchain_core.documents import Document
 
+
+class EmbedderAPIError(Exception):
+    """Custom exception for embedder API-related errors."""
+    pass
+
+
+def validate_vector(vec, logger):
+    try:
+        if vec is None:
+            raise EmbedderAPIError("No vector received from embedder API. Please review.")
+
+        if not isinstance(vec, list):
+            raise EmbedderAPIError("Non-list vector format received from embedder API. Please review.")
+        
+        if len(vec) != 1:
+            raise EmbedderAPIError("Non-1 element vector(?) list received from embedder API. Please review.")
+
+    except EmbedderAPIError as e:
+        logger.error(str(e))
+        raise
 
 class GeneralEmbeddingAPIClient(Embedder):
     def __init__(
@@ -28,8 +49,12 @@ class GeneralEmbeddingAPIClient(Embedder):
 
         for doc in documents:
             vec = self.embed_query(doc.page_content)
-            if vec is not None:
-                all_vectors.append(vec)
+
+            try:
+                validate_vector(vec, self.logger)
+                all_vectors.append(vec[0])
+            except EmbedderAPIError:
+                sys.exit(100)           
 
         return all_vectors
 
@@ -55,3 +80,5 @@ class GeneralEmbeddingAPIClient(Embedder):
         except requests.exceptions.RequestException as e:
             self.logger.error(f"An error occurred while making the request: {e}")
             return None
+        
+
