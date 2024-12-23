@@ -100,6 +100,7 @@ class UnstructuredMDLoader(DocumentLoader):
         result_document_list = []
 
         md_meta = {} # all the custom metadata we gather manually from the docs
+        # warning, this need to be checked every time
         md_meta["source"] = self.project + self.version + str(md_file.relative_to(self.file_path.parent.parent)).replace("\\", "/")
         try:
             elements = partition_md(
@@ -116,22 +117,25 @@ class UnstructuredMDLoader(DocumentLoader):
                 md_meta.update(msheaders)
             except Exception as e:
                 self.logger.warning(f"Skipping processing Microsoft markdown header of {md_meta["source"]}: {e}")
-            if "intent" in elements[0].text and elements[0].category == "Title":
-                try:
-                    intent = elements[0].text.split(":")[1:][0]
-                    md_meta["intent"] = intent
-                    elements.pop(0)
-                # then try another way
-                except:
+            if len(elements) > 0:
+                if "intent" in elements[0].text and elements[0].category == "Title":
                     try:
-                        md_meta["intent"] = elements[0].text
+                        intent = elements[0].text.split(":")[1:][0]
+                        md_meta["intent"] = intent
                         elements.pop(0)
-                    except Exception as e:
-                        self.logger.warning(f"Could not process intent, we skip then the header processing, {e}")
-                    
-            # no intent doc, lets try with processing the first header if there is no intent
-            if elements[0].category == "Title":
-                md_meta["main_header"] = elements.pop(0).text
+                    # then try another way
+                    except:
+                        try:
+                            md_meta["intent"] = elements[0].text
+                            elements.pop(0)
+                        except Exception as e:
+                            self.logger.warning(f"Could not process intent, we skip then the header processing, {e}")
+                        
+                # no intent doc, lets try with processing the first header if there is no intent
+                if elements[0].category == "Title":
+                    md_meta["main_header"] = elements.pop(0).text
+            else:
+                self.logger.warning(f"Not much stuff in here, skipping {md_meta["source"]}")
 
         
         chunks = chunk_by_title(
