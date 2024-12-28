@@ -39,6 +39,7 @@ class UnstructuredMDLoader(DocumentLoader):
         self.file_path: Path = Path(file_path).resolve()
         self.logger: logging.Logger = logging.getLogger('DocumentLoader')
         self.debug = False
+        self.example_source_shown = False
 
 
     def load(self) -> List[Document]:
@@ -102,10 +103,18 @@ class UnstructuredMDLoader(DocumentLoader):
         md_meta = {} # all the custom metadata we gather manually from the docs
         # warning, this need to be checked every time
         md_meta["source"] = self.project + self.version + str(md_file.relative_to(self.file_path.parent.parent)).replace("\\", "/")
+        if self.example_source_shown == False:
+            self.logger.info(f"sample meta source: , {md_meta['source']}")
+            self.example_source_shown = True
         try:
             elements = partition_md(
                 filename=md_file
                 )
+        except AttributeError as e:
+            # usually there is this e.g. skipping processing markdown file of 
+            # https://github.com/MicrosoftDocs/azure-docs/tree/main/articles/virtual-network/what-is-ip-address-168-63-129-16.md: 
+            # 'lxml.etree._ProcessingInstruction' object has no attribute 'is_phrasing'
+            return None
         except Exception as e:
             self.logger.error(f"Skipping processing markdown file of {md_meta["source"]}: {e}")
             return None
