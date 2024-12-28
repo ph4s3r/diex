@@ -41,6 +41,22 @@ class PineConeUpserter(VectorInserter):
             self.logger.error(f"No vectors received by PineCone Upserter, returning.")
             return None
         
+        # check the whole thing again for vector containers that does not have real value - where the embedding has basically failed
+
+        nullvectors = [] # gather the indexes here
+        for i, v in enumerate(vectors):
+            if v[0] == None:
+                nullvectors.append(i)
+
+        if len(nullvectors) > 0:
+            self.logger.info(f"Need to remove {len(nullvectors)} empty vector embeddings from the list:")
+            for index_of_nullvector in reversed(nullvectors):
+                self.logger.info(f"Removing: {documents[index_of_nullvector]}")
+                documents.pop(index_of_nullvector)
+                vectors.pop(index_of_nullvector)
+            
+
+        
         self.logger.info(f"Inserting will be attempted to namespace: {self.namespace}")
 
         # how to do this with host? really it is just index_name?
