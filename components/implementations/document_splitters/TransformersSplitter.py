@@ -16,8 +16,8 @@ class TransformersSplitter(DocumentSplitter):
         self.max_token_seq_len = max_token_seq_len
         self.token_overlap = token_overlap
 
-        # giving 33% smaller token length since this splitter is sometimes massively overshooting
-        langchain_splitter_token_max_len = self.max_token_seq_len - self.max_token_seq_len/3
+        # giving much smaller token length since this splitter is sometimes massively undershooting
+        langchain_splitter_token_max_len = self.max_token_seq_len/3
         # this is unsafe though... would be better to manually recursively split
         self.langchain_recursive_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
             model_name="gpt-4",
@@ -34,12 +34,15 @@ class TransformersSplitter(DocumentSplitter):
         all_chunks = []
 
         for doc in documents:
-            # chunking based on the model's innate sequence length
-            input_data = self.tokenizer(doc.page_content, padding="longest", truncation=False, max_length=self.max_token_seq_len, return_tensors="pt")
-            seq_length = len(input_data.encodings[0].tokens)
-            if seq_length > 512:
-                # self.logger.info(f"splitting doc because seq_length > 512. seq len = {seq_length}")
+            # chunking based on the model's sequence length calculation
+            # need to change this to recursive, because now we call it just twice... unmaintainable code
+            if len(self.tokenizer(doc.page_content, padding="longest", truncation=False, max_length=self.max_token_seq_len, return_tensors="pt").encodings[0].tokens) > self.max_token_seq_len:
                 chunked_docs = self.chunk(doc)
+                for i, cd in enumerate(chunked_docs):
+                    if len(self.tokenizer(cd.page_content, padding="longest", truncation=False, max_length=self.max_token_seq_len, return_tensors="pt").encodings[0].tokens) > self.max_token_seq_len:
+                        chunked_docs_level2 = self.chunk(cd)
+                        all_chunks.extend(chunked_docs_level2)
+                        chunked_docs.pop(i)
                 all_chunks.extend(chunked_docs)
             else:
                 chunk_doc = Document(
