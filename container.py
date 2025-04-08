@@ -50,7 +50,11 @@ class Container(containers.DeclarativeContainer):
     # )
 
     embedder = providers.Singleton(
-        VoyageEmbeddingAPIClient
+        VoyageEmbeddingAPIClient,
+        output_dimension=config.embedder.voyage.output_dimension,
+        output_dtype=config.embedder.voyage.output_dtype,
+        model=config.embedder.voyage.model,
+        batch_size=config.embedder.voyage.batch_size
     )
 
     # embedder = providers.Singleton(

@@ -17,6 +17,12 @@ splitter:
     token_overlap: 256
 
 embedder:
+  voyage:
+    output_dimension: 1024
+    output_dtype: float
+    model: voyage-3
+    batch_size: 128
+
   embedderapi:
     host: localhost
     port: 3001
