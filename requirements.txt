@@ -7,8 +7,11 @@ langchain-openai
 langchain-core
 langchain-community
 unstructured[md]
+termcolor
 nltk
 markdown
+voyageai
+tenacity
 # chromadb
 # chromadb-client==0.5.20
 # sentence transformers & utils
