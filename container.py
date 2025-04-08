@@ -1,9 +1,10 @@
 from dependency_injector import containers, providers
 from components.implementations.document_loaders.Unstructuredmdloader import UnstructuredMDLoader
 from components.implementations.document_loaders.pdf_loader import PDFLoader
-from components.implementations.document_splitters.TransformersSplitter import TransformersSplitter
-from components.implementations.embedders.api_embedder import GeneralEmbeddingAPIClient
-from components.implementations.embedders.st_embedder import SentenceTransformerEmbedder
+from components.implementations.document_splitters.VoyageSplitter import VoyageSplitter
+#from components.implementations.embedders.api_embedder import GeneralEmbeddingAPIClient
+from components.implementations.embedders.voyage import VoyageEmbeddingAPIClient
+# from components.implementations.embedders.st_embedder import SentenceTransformerEmbedder
 from components.implementations.vectordb_inserters.pinecone_upserter import PineConeUpserter
 from components.services.vector_indexer import VectorIndexer
 
@@ -30,7 +31,7 @@ class Container(containers.DeclarativeContainer):
     )
     
     document_splitter = providers.Singleton(
-        TransformersSplitter,
+        VoyageSplitter,
         max_token_seq_len=config.splitter.tokensplitter.max_token_seq_len,
         token_overlap=config.splitter.tokensplitter.token_overlap
     )
@@ -40,12 +41,16 @@ class Container(containers.DeclarativeContainer):
     #     embedding_model=config.embedder.embedding_model
     # )
 
+    # embedder = providers.Singleton(
+    #     GeneralEmbeddingAPIClient,
+    #     host=config.embedder.embedderapi.host,
+    #     port=config.embedder.embedderapi.port,
+    #     endpoint=config.embedder.embedderapi.endpoint,
+    #     inputs_arg=config.embedder.embedderapi.inputs_arg
+    # )
+
     embedder = providers.Singleton(
-        GeneralEmbeddingAPIClient,
-        host=config.embedder.embedderapi.host,
-        port=config.embedder.embedderapi.port,
-        endpoint=config.embedder.embedderapi.endpoint,
-        inputs_arg=config.embedder.embedderapi.inputs_arg
+        VoyageEmbeddingAPIClient
     )
 
     # embedder = providers.Singleton(
