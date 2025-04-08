@@ -42,6 +42,6 @@ embedder:
 #   collection: openai
 
 pinecone:
-  index_name: discovery
-  index_host_suffix: 226a147.svc.aped-4627-b74a.pinecone.io
-  namespace: azuredocs
+  index_name: novastella512
+  index_host_suffix: https://novastella512-226a147.svc.aped-4627-b74a.pinecone.io
+  namespace: microsoftdocs
