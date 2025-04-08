@@ -4,7 +4,7 @@ embedding_type: openai                                          # options: opena
 
 documentloader:
   # file_path: "/home/peet/dev/azure-docs-md/"                  # absolute nix
-  file_path: "G:\\dev\\azure-docs\\articles\\virtual-network"   # absolute win
+  file_path: "C:\\dev\\azure-docs\\articles\\virtual-network"   # absolute win
   # file_path: "files/"                                         # relative
   # file_path: 'G:\\dev\\azure-docs\\articles\\deployment-environments\\'
   max_workers: 140
@@ -13,8 +13,8 @@ documentloader:
 
 splitter:
   tokensplitter:
-    max_token_seq_len: 512
-    token_overlap: 150
+    max_token_seq_len: 1024
+    token_overlap: 256
 
 embedder:
   embedderapi:
