@@ -42,6 +42,6 @@ embedder:
 #   collection: openai
 
 pinecone:
-  index_name: discovery
-  index_host_suffix: 226a147.svc.aped-4627-b74a.pinecone.io
-  namespace: azuredocs
+  index_name: voyage
+  index_host_suffix: https://voyage-226a147.svc.aped-4627-b74a.pinecone.io
+  namespace: vnets1024
