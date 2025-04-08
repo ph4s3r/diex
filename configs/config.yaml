@@ -20,7 +20,7 @@ embedder:
   voyage:
     output_dimension: 1024
     output_dtype: float
-    model: voyage-3
+    model: voyage-3-large
     batch_size: 128
 
   embedderapi:
@@ -48,6 +48,6 @@ embedder:
 #   collection: openai
 
 pinecone:
-  index_name: voyage
-  index_host_suffix: https://voyage-226a147.svc.aped-4627-b74a.pinecone.io
-  namespace: vnets1024
+  index_name: voyage1024
+  index_host_suffix: 226a147.svc.aped-4627-b74a.pinecone.io # need to be something like 226a147.svc.aped-4627-b74a.pinecone.io
+  namespace: vnets1024 # namespace is created automatically if not exists
