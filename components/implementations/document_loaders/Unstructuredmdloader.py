@@ -116,7 +116,8 @@ class UnstructuredMDLoader(DocumentLoader):
             # 'lxml.etree._ProcessingInstruction' object has no attribute 'is_phrasing'
             return None
         except Exception as e:
-            self.logger.error(f"Skipping processing markdown file of {md_meta["source"]}: {e}")
+            src = md_meta["source"]
+            self.logger.error(f"Skipping processing markdown file of {src}: {e}")
             return None
         # all microsoft learn docs start with a special header, we try to process these 3 first elements automatically
         if any(substring in self.project for substring in ["azure", "microsoft"]) and "includes" not in md_meta["source"]:           
@@ -125,7 +126,8 @@ class UnstructuredMDLoader(DocumentLoader):
                 elements.pop(0).text
                 md_meta.update(msheaders)
             except Exception as e:
-                self.logger.warning(f"Skipping processing Microsoft markdown header of {md_meta["source"]}: {e}")
+                src = md_meta["source"]
+                self.logger.warning(f"Skipping processing Microsoft markdown header of {src}: {e}")
             if len(elements) > 0:
                 if "intent" in elements[0].text and elements[0].category == "Title":
                     try:
@@ -144,7 +146,8 @@ class UnstructuredMDLoader(DocumentLoader):
                 if elements[0].category == "Title":
                     md_meta["main_header"] = elements.pop(0).text
             else:
-                self.logger.warning(f"Not much stuff in here, skipping {md_meta["source"]}")
+                src = md_meta["source"]
+                self.logger.warning(f"Not much stuff in here, skipping {src}")
 
         
         chunks = chunk_by_title(
@@ -153,8 +156,8 @@ class UnstructuredMDLoader(DocumentLoader):
             include_orig_elements=True, # stores the elements under ["orig_elements"]
             max_characters=5000
             )
-        
-        self.logger.debug(f"created {len(chunks)} chunks from {md_meta["source"]}", "cyan")
+        src = md_meta["source"]
+        self.logger.debug(f"created {len(chunks)} chunks from {src}", "cyan")
 
         for chunk in chunks:
             md_h_list = [""] * 6 # markdown headers have a max depth of 6
