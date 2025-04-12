@@ -2,9 +2,7 @@ from dependency_injector import containers, providers
 from components.implementations.document_loaders.Unstructuredmdloader import UnstructuredMDLoader
 from components.implementations.document_loaders.pdf_loader import PDFLoader
 from components.implementations.document_splitters.VoyageSplitter import VoyageSplitter
-#from components.implementations.embedders.api_embedder import GeneralEmbeddingAPIClient
 from components.implementations.embedders.voyage import VoyageEmbeddingAPIClient
-# from components.implementations.embedders.st_embedder import SentenceTransformerEmbedder
 from components.implementations.vectordb_inserters.pinecone_upserter import PineConeUpserter
 from components.services.vector_indexer import VectorIndexer
 

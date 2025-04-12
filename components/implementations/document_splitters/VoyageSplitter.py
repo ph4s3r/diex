@@ -67,4 +67,3 @@ class VoyageSplitter(DocumentSplitter):
             allchunks.append(chunk_doc)
 
         return allchunks
-
