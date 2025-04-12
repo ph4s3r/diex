@@ -4,7 +4,7 @@ embedding_type: openai                                          # options: opena
 
 documentloader:
   # file_path: "/home/peet/dev/azure-docs-md/"                  # absolute nix
-  file_path: "G:\\dev\\azure-docs\\articles\\virtual-network"   # absolute win
+  file_path: "C:\\dev\\azure-docs\\articles\\virtual-network"   # absolute win
   # file_path: "files/"                                         # relative
   # file_path: 'G:\\dev\\azure-docs\\articles\\deployment-environments\\'
   max_workers: 140
@@ -13,10 +13,16 @@ documentloader:
 
 splitter:
   tokensplitter:
-    max_token_seq_len: 512
-    token_overlap: 150
+    max_token_seq_len: 1024
+    token_overlap: 256
 
 embedder:
+  voyage:
+    output_dimension: 1024
+    output_dtype: float
+    model: voyage-3-large
+    batch_size: 128
+
   embedderapi:
     host: localhost
     port: 3001
@@ -42,6 +48,6 @@ embedder:
 #   collection: openai
 
 pinecone:
-  index_name: novastella512
-  index_host_suffix: https://novastella512-226a147.svc.aped-4627-b74a.pinecone.io
-  namespace: microsoftdocs
+  index_name: voyage1024
+  index_host_suffix: 226a147.svc.aped-4627-b74a.pinecone.io # need to be something like 226a147.svc.aped-4627-b74a.pinecone.io
+  namespace: vnets1024 # namespace is created automatically if not exists
