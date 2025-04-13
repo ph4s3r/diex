@@ -5,8 +5,9 @@ from typing import List
 import logging
 import json
 import os
-from langchain_core.documents import Document
+from langchain_core.documents import Document as Langchain_Document
 from llmsherpa.readers import LayoutPDFReader
+from llmsherpa.readers import Document as Sherpa_Document
 
 class PDFLoader(DocumentLoader):
 
@@ -14,14 +15,20 @@ class PDFLoader(DocumentLoader):
             self, 
             file_path: str,
             api_url: str,
+            api_url_ocr: str,
             ) -> None:
 
         self.file_path: Path = Path(file_path).resolve()
         self.logger: logging.Logger = logging.getLogger('DocumentLoader')
         self.api_url = api_url
+        self.api_url_ocr = api_url_ocr
         self.pdf_reader = LayoutPDFReader(self.api_url)
+        self.do_ocr = False
+        self.pdf_reader_ocr = None
+        if self.do_ocr:
+            self.pdf_reader_ocr = LayoutPDFReader(self.api_url_ocr)
         
-    def load(self) -> List[Document]:
+    def load(self) -> List[Langchain_Document]:
 
         try:
             if not self.file_path.exists():
@@ -39,28 +46,44 @@ class PDFLoader(DocumentLoader):
             
             self.logger.info(f"Found {num_files} pdf file(s) in {self.file_path}")
 
-            all_docs: List[Document] = []
+            all_docs: List[Langchain_Document] = []
 
             for pdf in pdfs:
                 try: 
-
-                    # this returned with some bogus error message...
-                    # doc = self.pdf_reader.read_pdf(
-                    #     path_or_url=str(pdf), 
-                    #     contents=None
-                    #     )
-                    # so here is read_pdf fun from lib
-
-                    path_or_url = str(pdf)
-                    file_name = os.path.basename(path_or_url)
-                    with open(path_or_url, "rb") as f:
+                    pdf_path = str(pdf)
+                    file_name = os.path.basename(pdf_path)
+                    with open(pdf_path, "rb") as f:
                         file_data = f.read()
                         pdf_file = (file_name, file_data, 'application/pdf')
                     parser_response = self.pdf_reader._parse_pdf(pdf_file)
                     response_json = json.loads(parser_response.data.decode("utf-8"))
                     blocks = response_json['return_dict']['result']['blocks']
+                    # blocks are the extracted elements. If there are none, the reading has failed
+                    if len(blocks) > 0:
+                        # encapsulate blocks to a llmsherpa.readers.Document object
+                        doc = Sherpa_Document(blocks)
+                        doc.sections()[0].to_html(include_children=True, recurse=True)
+                        doc.sections()[1].block_json
+                        doc.sections()[0].to_text()
+                        doc.sections()[1].bbox
+                        # llmsherpa.readers.Layout
+                        html_doc = doc.to_html()
+                        
+                        # maybe we need here to parse HTML...
 
-                    all_docs.extend(Document(blocks))
+                        all_docs.extend(Sherpa_Document(blocks))
+                    else:
+                        if self.do_ocr:
+                            self.logger.info(f"Could not parse {pdf_path}, trying with OCR.")
+                            parser_response = self.pdf_reader_ocr._parse_pdf(pdf_file)
+                            response_json = json.loads(parser_response.data.decode("utf-8"))
+                            blocks = response_json['return_dict']['result']['blocks']
+                            if len(blocks) > 0:
+                                all_docs.extend(Sherpa_Document(blocks))
+                            else:
+                                self.logger.warning(f"Could not parse {pdf_path}, even with OCR, moving on..")
+                        else:
+                            self.logger.warning(f"Could not parse {pdf_path}; OCR is disabled, moving on.")
                 except Exception as e:
                     self.logger.error(f"Unhandled exception when reading single PDF file for {pdf}: {e}")
 

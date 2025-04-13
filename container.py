@@ -24,7 +24,8 @@ class Container(containers.DeclarativeContainer):
         pdf=providers.Singleton(
             PDFLoader,
             file_path=config.documentloader.file_path,
-            api_url=config.documentloader.api_url
+            api_url=config.documentloader.api_url,
+            api_url_ocr=config.documentloader.api_url_ocr
         )
     )
     

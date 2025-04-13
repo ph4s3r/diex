@@ -11,7 +11,11 @@ documentloader:
   max_workers: 140
   # project: https://github.com/MicrosoftDocs/azure-docs/         # we generate a source metadata from project+location
   # version: "tree/main/"
-  api_url: "https://readers.llmsherpa.com/api/document/developer/parseDocument?renderFormat=all"
+  # LLMSherpa SERVER is not working anymore, need to run the backend  locally:
+  # docker pull ghcr.io/nlmatics/nlm-ingestor:latest
+  # docker run -p 5010:5001 ghcr.io/nlmatics/nlm-ingestor:latest # (this is just for dev)
+  api_url: "http://localhost:5010/api/parseDocument?renderFormat=all"
+  api_url_ocr: "http://localhost:5010/api/parseDocument?renderFormat=all&applyOcr=yes"
 
 splitter:
   tokensplitter:
