@@ -16,12 +16,10 @@ class VoyageSplitter(DocumentSplitter):
         self.max_token_seq_len = max_token_seq_len
         self.token_overlap = token_overlap
 
-        # giving much smaller token length since this splitter is sometimes massively undershooting
-        langchain_splitter_token_max_len = self.max_token_seq_len/3
         # this is unsafe though... would be better to manually recursively split
         self.langchain_recursive_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
             model_name="gpt-4",
-            chunk_size=langchain_splitter_token_max_len, 
+            chunk_size=max_token_seq_len, 
             chunk_overlap=self.token_overlap
         )
         self.tokenizer = AutoTokenizer.from_pretrained("voyageai/voyage-3")
