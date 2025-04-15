@@ -9,8 +9,8 @@ documentloader:
   # file_path: "files/"                                         # relative
   # file_path: 'G:\\dev\\azure-docs\\articles\\deployment-environments\\'
   max_workers: 140
-  # project: https://github.com/MicrosoftDocs/azure-docs/         # we generate a source metadata from project+location
-  # version: "tree/main/"
+  project: https://github.com/MicrosoftDocs/azure-docs/         # we generate a source metadata from project+location
+  version: "tree/main/"
   # LLMSherpa SERVER is not working anymore, need to run the backend  locally:
   # docker pull ghcr.io/nlmatics/nlm-ingestor:latest
   # docker run -p 5010:5001 ghcr.io/nlmatics/nlm-ingestor:latest # (this is just for dev)
