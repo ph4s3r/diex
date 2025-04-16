@@ -74,6 +74,8 @@ class PDFLoader(DocumentLoader):
         return result_document_list
         
     def load(self) -> List[Langchain_Document]:
+        """Reads all PDF files from the input dir, calls LLMSherpa PDF parser (_parse_pdf) which 
+        outputs llmsherpa.readers.Document formats, then pass to unstructured to parse it as HTML"""
 
         try:
             if not self.file_path.exists():
