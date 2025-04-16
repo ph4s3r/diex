@@ -5,14 +5,11 @@ from typing import List
 import logging
 import json
 import os
-import pprint
-from termcolor import cprint
 from llmsherpa.readers import LayoutPDFReader
 from unstructured.partition.html import partition_html
 from unstructured.chunking.title import chunk_by_title
 from llmsherpa.readers import Document as Sherpa_Document
 from langchain_core.documents import Document as Langchain_Document
-from unstructured.staging.base import elements_from_base64_gzipped_json
 
 
 class PDFLoader(DocumentLoader):
@@ -36,81 +33,43 @@ class PDFLoader(DocumentLoader):
 
         self.debug = False
 
-    def _unstruct_partition_single_html(self, doc: Sherpa_Document, pdf_path: str) -> List[Langchain_Document]:
+    def _unstruct_partition_single_html(self, doc: Sherpa_Document, pdf_stem: str) -> List[Langchain_Document]:
         """Ingesting a Sherpa_Document, converting to HTML and parsing as HTML to a Langchain doc"""
 
-
-        # llmsherpa.readers.Layout
-        doc.sections()[0].to_html(include_children=True, recurse=True)
-        doc.sections()[1].block_json
-        doc.sections()[0].to_text()
-        doc.sections()[1].bbox
         html_doc = doc.to_html()
+
         try:
             elements = partition_html(text=html_doc)
+            # v2 only works if there is a body and div doc etc.. "No <body class='Document'> or <div class='Page'> element found in the HTML.""
+            # v2_elements = partition_html(
+            #     text=html_doc, html_parser_version="v2", unique_element_ids=True
+            # )
+        
         except Exception as e:
             self.logger.warning(f"Error in unstructured partition_html: {e}")
 
         chunks = chunk_by_title(
             elements, 
-            combine_text_under_n_chars=0,
-            include_orig_elements=True, # stores the elements under ["orig_elements"]
-            max_characters=5000
+            combine_text_under_n_chars=200,
+            include_orig_elements=False, # used for metadata gathering
             )
         
-        self.logger.debug(f"created {len(chunks)} chunks from {pdf_path}", "cyan")
+        self.logger.debug(f"created {len(chunks)} chunks from {pdf_stem}", "cyan")
 
         # this is what we return
         result_document_list = []
 
-        html_meta = {} # all the custom metadata we gather manually from the docs
+        # metadata
+        # need to implement similar metadata gathering as in markdown, i.e. book title, last header / subtitle etc..
+        html_meta = {"source": pdf_stem}
 
+        
         for chunk in chunks:
-            md_h_list = [""] * 6 # markdown headers have a max depth of 6
-            # TODO: get HTML header
-            # md_h_list[0] = html_meta.get("main_header", "")
-            chunk_meta = html_meta
-            chunk_inmeta = chunk.metadata.to_dict()
-            orig_elements = elements_from_base64_gzipped_json(chunk_inmeta["orig_elements"])
-            # standalone header 
-            # len(orig_elements[0].text) > 5 BUG!!! :
-            # unstructured sometimes classifies a few standalone words or just a random line as a title, 
-            # while our mechanism here relies on the promised title based splitting...
-            if len(orig_elements) == 1 and orig_elements[0].category == 'Title' and len(orig_elements[0].text) > 5:
-                # will jnot be saved as a separate chunk / vector - we just save it as a header (metadata)
-                depth = orig_elements[0].metadata.category_depth
-                # resetting the md headers until the current title depth (the depth 2 header resets an earlier depth 3 and below)
-                md_h_list[depth:] = [""] * (len(md_h_list) - depth)
-                md_h_list[orig_elements[0].metadata.category_depth] = orig_elements[0].text
-                self.logger.debug(f"Standalone chunk: {orig_elements[0].text}")
-            else:
-                # all the markdown headers have a category depth = no. of hashtags - 1 - load them into the chunk meta
-                for elem in orig_elements:
-                    if elem.category == 'Title':
-                        depth = elem.metadata.category_depth
-                        md_h_list[depth:] = [""] * (len(md_h_list) - depth)
-                        md_h_list[elem.metadata.category_depth] = elem.text
-                # remove empty headers
-                while len(md_h_list) > 0:
-                    if md_h_list[-1] == "":
-                        md_h_list.pop()
-                    else:
-                        break
-                chunk_meta.pop('author', None)
-                chunk_meta.pop('ms.author', None)
-                if len(md_h_list) > 0:
-                    markdown_header_struct_dict = {f"header_{i}": value for i, value in enumerate(md_h_list)}
-                    chunk_meta.update(markdown_header_struct_dict)
-                result_document_list.append(Langchain_Document(
-                    page_content=str(chunk),
-                    metadata=chunk_meta
-                ))
-                if self.debug:
-                    cprint("  CHUNK META:", "red")
-                    pprint.pprint(chunk_meta)
-                    cprint("  DOC page_content:", "red")
-                    cprint(str(chunk), "green")
-                    cprint("\n\n" + "-"*80, "red")
+            result_document_list.append(Langchain_Document(
+                        page_content=str(chunk),
+                        metadata=html_meta
+                    ))
+
 
         return result_document_list
         
@@ -148,7 +107,7 @@ class PDFLoader(DocumentLoader):
                     if len(blocks) > 0:
                         # encapsulate blocks to a llmsherpa.readers.Document object
                         doc = Sherpa_Document(blocks)
-                        lc_docs = self._unstruct_partition_single_html(doc, pdf_path) 
+                        lc_docs = self._unstruct_partition_single_html(doc, str(pdf.stem)) 
                         all_docs.extend(lc_docs)
                     else:
                         if self.do_ocr:
@@ -161,7 +120,7 @@ class PDFLoader(DocumentLoader):
                             else:
                                 self.logger.warning(f"Could not parse {pdf_path}, even with OCR, moving on..")
                         else:
-                            self.logger.warning(f"Could not parse {pdf_path}; OCR is disabled, moving on.")
+                            self.logger.warning(f"{pdf_path} needs OCR, won't be parsed since OCR is disabled, moving on.")
                 except Exception as e:
                     self.logger.error(f"Unhandled exception when reading single PDF file for {pdf}: {e}")
 
