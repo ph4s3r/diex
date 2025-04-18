@@ -1,7 +1,7 @@
 from dependency_injector import containers, providers
 from components.implementations.document_loaders.UnstructuredMDLoader import UnstructuredMDLoader
 from components.implementations.document_loaders.LLMSherpaPDFLoader import PDFLoader
-from components.implementations.document_splitters.VoyageSplitter import VoyageSplitter
+from components.implementations.document_splitters.TiktokenRecursiveSplitter import TiktokenRecursiveSplitter
 from components.implementations.embedders.voyage import VoyageEmbeddingAPIClient
 from components.implementations.vectordb_inserters.pinecone_upserter import PineConeUpserter
 from components.services.vector_indexer import VectorIndexer
@@ -30,23 +30,10 @@ class Container(containers.DeclarativeContainer):
     )
     
     document_splitter = providers.Singleton(
-        VoyageSplitter,
+        TiktokenRecursiveSplitter,
         max_token_seq_len=config.splitter.tokensplitter.max_token_seq_len,
         token_overlap=config.splitter.tokensplitter.token_overlap
     )
-
-    # embedder = providers.Singleton(
-    #     SentenceTransformerEmbedder,
-    #     embedding_model=config.embedder.embedding_model
-    # )
-
-    # embedder = providers.Singleton(
-    #     GeneralEmbeddingAPIClient,
-    #     host=config.embedder.embedderapi.host,
-    #     port=config.embedder.embedderapi.port,
-    #     endpoint=config.embedder.embedderapi.endpoint,
-    #     inputs_arg=config.embedder.embedderapi.inputs_arg
-    # )
 
     embedder = providers.Singleton(
         VoyageEmbeddingAPIClient,
@@ -55,15 +42,6 @@ class Container(containers.DeclarativeContainer):
         model=config.embedder.voyage.model,
         batch_size=config.embedder.voyage.batch_size
     )
-
-    # embedder = providers.Singleton(
-    #     OpenAIEmbedder,
-    #     model=config.embedder.embedding_model,
-    #     batch_size=config.embedder.openai.batch_size,
-    #     max_tokens_per_minute=config.embedder.openai.max_tokens_per_minute,
-    #     max_requests_per_minute=config.embedder.openai.max_requests_per_minute,
-    #     batch_queue_limit=config.embedder.openai.batch_queue_limit
-    # )
 
     vector_inserter = providers.Singleton(
         PineConeUpserter,
