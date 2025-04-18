@@ -1,6 +1,7 @@
 from components.interfaces.all_interfaces import Embedder
 
 import sys
+import time
 import logging
 import voyageai
 from tenacity import (
@@ -38,6 +39,35 @@ class VoyageEmbedder(Embedder):
         self.batch_size = batch_size
         self.vo = voyageai.Client()
         self.logger = logging.getLogger('Embedder')
+
+    def conntest(self, max_retries: int = 4):
+        """
+        Basic connectivity test for the Voyage AI embedding endpoint.
+        Tries to embed a simple "hello world" string with the model and
+        parameters already configured on this instance.
+        """
+
+        retries = 0
+        while True:
+            try:
+                self.vo.embed(
+                    texts=["hello world"],
+                    model=self.model,
+                    input_type="document",
+                    output_dimension=self.output_dimension,
+                    output_dtype=self.output_dtype,
+                    truncation=True,
+                )
+                self.logger.info(f"Established connection with Voyage AI (model: {self.model}).")
+                break
+            except Exception as e:
+                retries += 1
+                if retries >= max_retries:
+                    self.logger.error(f"Voyage AI connection test failed after {retries} attempts: {e}")
+                    sys.exit(1)
+                self.logger.warning(f"Voyage AI connection test failed ({e}); retrying in 3 seconds…")
+                time.sleep(3)
+
 
     def embed(self, documents: List["Document"]) -> List[List[float]]:
         self.logger.info("Embedding starts with Voyage EMBEDDING API in batches")
