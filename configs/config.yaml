@@ -17,10 +17,12 @@ documentloader:
   api_url: "http://localhost:5010/api/parseDocument?renderFormat=all"
   api_url_ocr: "http://localhost:5010/api/parseDocument?renderFormat=all&applyOcr=yes"
 
+
 splitter:
   tokensplitter:
     max_token_seq_len: 1024
     token_overlap: 256
+
 
 embedder:
   voyage:
@@ -29,13 +31,6 @@ embedder:
     model: voyage-3-large
     batch_size: 128
 
-
-# chroma:
-#   url: chroma.d3eyekfegubub9fz.switzerlandnorth.azurecontainer.io
-#   port: 8000
-#   tenant: default_tenant
-#   database: default_database
-#   collection: openai
 
 pinecone:
   index_name: voyage1024
