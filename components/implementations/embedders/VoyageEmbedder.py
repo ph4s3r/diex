@@ -25,13 +25,13 @@ def validate_vector(vec, logger):
         logger.error(str(e))
         raise
 
-class VoyageEmbeddingAPIClient(Embedder):
+class VoyageEmbedder(Embedder):
     def __init__(self,
                  output_dimension,
                  output_dtype,
                  model,
                  batch_size):
-        # voyageai.api_key = "[Environment]::SetEnvironmentVariable("VOYAGE_API_KEY", "apikeyhere", "Proess")"
+        
         self.output_dimension = output_dimension
         self.output_dtype = output_dtype
         self.model = model
@@ -55,7 +55,7 @@ class VoyageEmbeddingAPIClient(Embedder):
                 input_type="document",      
                 output_dimension=self.output_dimension,      
                 output_dtype=self.output_dtype,
-                truncation=True             # default, but it should not happen
+                truncation=True             # if this happens... voyage3 models have 32k token limit...
             )
         
         # batching
