@@ -1,0 +1,25 @@
+[project]
+name = "diex"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "dependency-injector>=4.46.0",
+    "google>=3.0.0",
+    "googleapis-common-protos>=1.70.0",
+    "grpcio>=1.71.0",
+    "langchain>=0.3.23",
+    "langchain-core>=0.3.52",
+    "llmsherpa>=0.1.4",
+    "markdown>=3.8",
+    "pinecone>=6.0.2",
+    "protobuf>=6.30.2",
+    "termcolor>=3.0.1",
+    "tiktoken>=0.9.0",
+    "torch>=2.6.0",
+    "transformers>=4.51.3",
+    "unstructured",
+    "voyageai>=0.3.2",
+]
+
+[tool.uv.sources]
+unstructured = { git = "https://github.com/ph4s3r/unstructured.git", rev = "main" }

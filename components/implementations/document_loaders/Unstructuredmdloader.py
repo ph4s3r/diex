@@ -10,9 +10,6 @@ from langchain_core.documents import Document
 from unstructured.partition.md import partition_md
 from unstructured.chunking.title import chunk_by_title
 from unstructured.staging.base import elements_from_base64_gzipped_json
-from langchain_core.documents import Document
-
-
 
 
 class UnstructuredMDLoader(DocumentLoader):
@@ -40,6 +37,7 @@ class UnstructuredMDLoader(DocumentLoader):
         self.logger: logging.Logger = logging.getLogger('DocumentLoader')
         self.debug = False
         self.example_source_shown = False
+        self.meta_scr_warned = False
 
 
     def load(self) -> List[Document]:
@@ -102,15 +100,19 @@ class UnstructuredMDLoader(DocumentLoader):
 
         md_meta = {} # all the custom metadata we gather manually from the docs
         # warning, this need to be checked every time
-        md_meta["source"] = self.project + self.version + str(md_file.relative_to(self.file_path.parent.parent)).replace("\\", "/")
-        if self.example_source_shown == False:
+        try:
+            md_meta["source"] = self.project + self.version + str(md_file.relative_to(self.file_path.parent.parent)).replace("\\", "/")
+        except Exception as e:
+            self.meta_scr_warned = True
+            self.logger.warning(f"meta source cannot be compiled from the file ({str(md_file)}) because something is missing: {e}")
+        if not self.example_source_shown:
             self.logger.info(f"sample meta source: , {md_meta['source']}")
             self.example_source_shown = True
         try:
             elements = partition_md(
                 filename=md_file
                 )
-        except AttributeError as e:
+        except AttributeError:
             # usually there is this e.g. skipping processing markdown file of 
             # https://github.com/MicrosoftDocs/azure-docs/tree/main/articles/virtual-network/what-is-ip-address-168-63-129-16.md: 
             # 'lxml.etree._ProcessingInstruction' object has no attribute 'is_phrasing'
@@ -198,9 +200,9 @@ class UnstructuredMDLoader(DocumentLoader):
                     metadata=chunk_meta
                 ))
                 if self.debug:
-                    cprint(f"  CHUNK META:", "red")
+                    cprint("  CHUNK META:", "red")
                     pprint.pprint(chunk_meta)
-                    cprint(f"  DOC page_content:", "red")
+                    cprint("  DOC page_content:", "red")
                     cprint(str(chunk), "green")
                     cprint("\n\n" + "-"*80, "red")
 

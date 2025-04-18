@@ -1,6 +1,6 @@
 from dependency_injector import containers, providers
 from components.implementations.document_loaders.Unstructuredmdloader import UnstructuredMDLoader
-from components.implementations.document_loaders.pdf_loader import PDFLoader
+from components.implementations.document_loaders.LLMSherpaPDFLoader import PDFLoader
 from components.implementations.document_splitters.VoyageSplitter import VoyageSplitter
 from components.implementations.embedders.voyage import VoyageEmbeddingAPIClient
 from components.implementations.vectordb_inserters.pinecone_upserter import PineConeUpserter
@@ -24,7 +24,8 @@ class Container(containers.DeclarativeContainer):
         pdf=providers.Singleton(
             PDFLoader,
             file_path=config.documentloader.file_path,
-            project=config.documentloader.project
+            api_url=config.documentloader.api_url,
+            api_url_ocr=config.documentloader.api_url_ocr
         )
     )
     
