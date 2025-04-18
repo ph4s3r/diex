@@ -1,5 +1,6 @@
 from components.interfaces.all_interfaces import VectorInserter
 
+import sys
 import time
 import logging
 from typing import List
@@ -28,6 +29,20 @@ class PineConeInserter(VectorInserter):
         
         self.pc = Pinecone(api_key=self.api_key)
         self.index = self.pc.Index(host=self.index_host)
+
+        
+
+    def conntest(self, max_retries: int = 4):
+
+        retried = 0
+
+        while not self.pc.describe_index(self.index_name).status['ready']:
+            self.logger.warning("PineCone Index unavailable at the moment, retrying in every 3 seconds")
+            time.sleep(3)
+            retried = retried + 1
+            if retried == max_retries:
+                self.logger.error("PineCone Index is unavailable, exiting.")
+                sys.exit(1)
         self.logger.info(f"Established connection with index at host {self.index_host}, index name: {self.index_name}")
 
     def _batchify(self, items: List[dict], batch_size: int):
@@ -36,9 +51,7 @@ class PineConeInserter(VectorInserter):
 
     def insert(self, documents: List[Document], vectors: List[List[float]] = None) -> None:
 
-        if vectors is None:
-            self.logger.error("No vectors received by PineCone Upserter, returning.")
-            return None
+        self.conntest()
         
         # check the whole thing again for vector containers that does not have real value - where the embedding has basically failed
 
@@ -62,7 +75,7 @@ class PineConeInserter(VectorInserter):
         # https://sdk.pinecone.io/python/pinecone.html#describe-index
         
         while not self.pc.describe_index(self.index_name).status['ready']:
-            time.sleep(1)
+            time.sleep(3)
 
         embeddings = []
 

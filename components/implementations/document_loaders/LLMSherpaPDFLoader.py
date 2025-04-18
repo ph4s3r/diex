@@ -3,7 +3,9 @@ from components.interfaces.all_interfaces import DocumentLoader
 from pathlib import Path
 from typing import List
 import logging
+import time
 import json
+import sys
 import os
 from llmsherpa.readers import LayoutPDFReader
 from unstructured.partition.html import partition_html
@@ -31,6 +33,30 @@ class PDFLoader(DocumentLoader):
             self.pdf_reader_ocr = LayoutPDFReader(self.api_url_ocr)
 
         self.debug = False
+
+    def conntest(self, max_retries: int = 4) -> None:
+        """Tries to parse a known good PDF URL (like Google's PDF) to verify if the NLM ingester is responsive."""
+        
+        test_url = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"  # Small dummy PDF
+        retried = 0
+
+        while retried < max_retries:
+            try:
+                result = self.pdf_reader.read_pdf(path_or_url=test_url)
+                if isinstance(result.json[0], dict):
+                    self.logger.info(f"Established connection with NLM-INGESTOR at endpoint {self.api_url}")
+                    return
+            except Exception as e:
+                self.logger.error(f"NLM-INGESTOR connection test failed with an error: {e}")
+                sys.exit(1)
+            
+            retried += 1
+            time.sleep(3)
+
+        self.logger.error("NLM-INGESTOR connection test failed after retries. Exiting.")
+        sys.exit(1)
+
+
 
     def _unstruct_partition_single_html(self, doc: Sherpa_Document, pdf_stem: str) -> List[Langchain_Document]:
         """Ingesting a Sherpa_Document, converting to HTML and parsing as HTML to a Langchain doc

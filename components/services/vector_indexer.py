@@ -20,6 +20,10 @@ class VectorIndexer:
 
     def process(self) -> None:
 
+        self.logger.info("BEGIN BASIC SANITY TESTS")
+        self.sanity()
+        self.logger.info("SANITY TESTS PASSED")
+
         self.logger.info("BEGIN LOADING")
         documents = self.document_loader.load()
         number_of_docs_indexed = len(documents)
@@ -42,3 +46,14 @@ class VectorIndexer:
         self.vector_inserter.insert(documents=split_documents, vectors=embeddings)
         
         self.logger.info("END")
+
+    def sanity(self) -> None:
+
+        self.logger.info("TESTING LOCAL NLMATICS/LLMSHERPA EMBEDDER API")
+        self.document_loader.conntest()
+
+        self.logger.info("TESTING PINECONE API")
+        self.vector_inserter.conntest()
+
+        self.logger.info("TESTING VOYAGEAI EMBEDDING API")
+        self.embedder.conntest()
