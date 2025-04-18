@@ -11,7 +11,6 @@ from unstructured.chunking.title import chunk_by_title
 from llmsherpa.readers import Document as Sherpa_Document
 from langchain_core.documents import Document as Langchain_Document
 
-
 class PDFLoader(DocumentLoader):
 
     def __init__(
@@ -34,7 +33,8 @@ class PDFLoader(DocumentLoader):
         self.debug = False
 
     def _unstruct_partition_single_html(self, doc: Sherpa_Document, pdf_stem: str) -> List[Langchain_Document]:
-        """Ingesting a Sherpa_Document, converting to HTML and parsing as HTML to a Langchain doc"""
+        """Ingesting a Sherpa_Document, converting to HTML and parsing as HTML to a Langchain doc
+        """
 
         html_doc = doc.to_html()
 
@@ -44,6 +44,10 @@ class PDFLoader(DocumentLoader):
             # v2_elements = partition_html(
             #     text=html_doc, html_parser_version="v2", unique_element_ids=True
             # )
+            if self.debug:
+                for i, e in enumerate(elements):
+                    if "This is where services like" in e.text:
+                        print(i, "got ya")
         
         except Exception as e:
             self.logger.warning(f"Error in unstructured partition_html: {e}")
@@ -51,8 +55,14 @@ class PDFLoader(DocumentLoader):
         chunks = chunk_by_title(
             elements, 
             combine_text_under_n_chars=200,
-            include_orig_elements=False, # used for metadata gathering
+            include_orig_elements=True, # used for metadata gathering
+            max_characters = 150000
             )
+        
+        if self.debug:
+            for chunk in chunks:
+                if "This is where services like" in chunk.text:
+                    print(i, "got ya")
         
         self.logger.debug(f"created {len(chunks)} chunks from {pdf_stem}", "cyan")
 
@@ -70,12 +80,12 @@ class PDFLoader(DocumentLoader):
                         metadata=html_meta
                     ))
 
-
         return result_document_list
         
     def load(self) -> List[Langchain_Document]:
         """Reads all PDF files from the input dir, calls LLMSherpa PDF parser (_parse_pdf) which 
-        outputs llmsherpa.readers.Document formats, then pass to unstructured to parse it as HTML"""
+        outputs llmsherpa.readers.Document formats, then pass to unstructured to parse it as HTML
+        """
 
         try:
             if not self.file_path.exists():
@@ -128,6 +138,12 @@ class PDFLoader(DocumentLoader):
 
             if len(all_docs) > 0:
                 self.logger.info(f"Successfully loaded {len(all_docs)} document(s) from {num_files} pdfs(s)")
+            if self.debug:
+                saveout = []
+                for d in all_docs:
+                    saveout.append({"content-length": len(d.page_content), "content": d.page_content})
+                with open("chunks-before-splitting.json", "w", encoding="utf-8") as f:
+                    json.dump(saveout, f, indent=2, ensure_ascii=False)
             return all_docs
     
         except Exception as e:
