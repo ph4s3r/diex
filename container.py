@@ -1,5 +1,5 @@
 from dependency_injector import containers, providers
-from components.implementations.document_loaders.Unstructuredmdloader import UnstructuredMDLoader
+from components.implementations.document_loaders.UnstructuredMDLoader import UnstructuredMDLoader
 from components.implementations.document_loaders.LLMSherpaPDFLoader import PDFLoader
 from components.implementations.document_splitters.VoyageSplitter import VoyageSplitter
 from components.implementations.embedders.voyage import VoyageEmbeddingAPIClient
