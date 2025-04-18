@@ -3,7 +3,7 @@ from components.implementations.document_loaders.UnstructuredMDLoader import Uns
 from components.implementations.document_loaders.LLMSherpaPDFLoader import PDFLoader
 from components.implementations.document_splitters.TiktokenRecursiveSplitter import TiktokenRecursiveSplitter
 from components.implementations.embedders.VoyageEmbedder import VoyageEmbedder
-from components.implementations.vectordb_inserters.pinecone_upserter import PineConeUpserter
+from components.implementations.vectordb_inserters.PineConeInserter import PineConeInserter
 from components.services.vector_indexer import VectorIndexer
 
 
@@ -44,7 +44,7 @@ class Container(containers.DeclarativeContainer):
     )
 
     vector_inserter = providers.Singleton(
-        PineConeUpserter,
+        PineConeInserter,
         api_key=config.pinecone.api_key,
         index_name=config.pinecone.index_name,
         index_host_suffix=config.pinecone.index_host_suffix,

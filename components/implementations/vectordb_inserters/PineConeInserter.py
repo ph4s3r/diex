@@ -8,7 +8,7 @@ from pinecone.grpc import PineconeGRPC as Pinecone
 from langchain_core.documents import Document
 
 
-class PineConeUpserter(VectorInserter):
+class PineConeInserter(VectorInserter):
 
     MAX_BATCH_SIZE = 300
 
@@ -17,7 +17,6 @@ class PineConeUpserter(VectorInserter):
                  index_name,
                  namespace,
                  index_host_suffix
-
     ) -> None:
 
         self.api_key = api_key
@@ -38,14 +37,14 @@ class PineConeUpserter(VectorInserter):
     def insert(self, documents: List[Document], vectors: List[List[float]] = None) -> None:
 
         if vectors is None:
-            self.logger.error(f"No vectors received by PineCone Upserter, returning.")
+            self.logger.error("No vectors received by PineCone Upserter, returning.")
             return None
         
         # check the whole thing again for vector containers that does not have real value - where the embedding has basically failed
 
         nullvectors = [] # gather the indexes here
         for i, v in enumerate(vectors):
-            if v[0] == None:
+            if v[0] is None:
                 nullvectors.append(i)
 
         if len(nullvectors) > 0:
@@ -55,7 +54,6 @@ class PineConeUpserter(VectorInserter):
                 documents.pop(index_of_nullvector)
                 vectors.pop(index_of_nullvector)
             
-
         
         self.logger.info(f"Inserting will be attempted to namespace: {self.namespace}")
 
