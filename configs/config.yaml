@@ -29,22 +29,6 @@ embedder:
     model: voyage-3-large
     batch_size: 128
 
-  embedderapi:
-    host: localhost
-    port: 3001
-    endpoint: embed
-    inputs_arg: inputs
-    
-  # embedding_model: "text-embedding-3-small"                   #options: https://platform.openai.com/docs/guides/embeddings/
-  embedding_model: "dunzhang/stella_en_1.5B_v5"
-  batch_size: 6000 
-  openai:
-    batch_size: 2048
-    max_tokens_per_minute: 150000                         # TPM: error: on tokens per min (TPM): Limit 150000, Requested 172752. 
-    max_requests_per_minute: 3000                         # RPM: 3,000 
-    batch_queue_limit: 3000000                            # Batch Queue Limit: 3,000,000
-  sentencetransformer:
-    batch_size: 2
 
 # chroma:
 #   url: chroma.d3eyekfegubub9fz.switzerlandnorth.azurecontainer.io

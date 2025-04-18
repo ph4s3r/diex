@@ -2,7 +2,7 @@ from dependency_injector import containers, providers
 from components.implementations.document_loaders.UnstructuredMDLoader import UnstructuredMDLoader
 from components.implementations.document_loaders.LLMSherpaPDFLoader import PDFLoader
 from components.implementations.document_splitters.TiktokenRecursiveSplitter import TiktokenRecursiveSplitter
-from components.implementations.embedders.voyage import VoyageEmbeddingAPIClient
+from components.implementations.embedders.VoyageEmbedder import VoyageEmbedder
 from components.implementations.vectordb_inserters.pinecone_upserter import PineConeUpserter
 from components.services.vector_indexer import VectorIndexer
 
@@ -36,7 +36,7 @@ class Container(containers.DeclarativeContainer):
     )
 
     embedder = providers.Singleton(
-        VoyageEmbeddingAPIClient,
+        VoyageEmbedder,
         output_dimension=config.embedder.voyage.output_dimension,
         output_dtype=config.embedder.voyage.output_dtype,
         model=config.embedder.voyage.model,
