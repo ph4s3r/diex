@@ -13,9 +13,6 @@ from langchain_core.documents import Document as Langchain_Document
 from components.interfaces.all_interfaces import DocumentLoader
 
 
-logger = logging.getLogger(__file__)
-
-
 class PDFLoader(DocumentLoader):
 
     def __init__(self, file_path: str, api_url: str, api_url_ocr: str) -> None:
@@ -30,6 +27,7 @@ class PDFLoader(DocumentLoader):
         self.pdf_reader_ocr = LayoutPDFReader(self.api_url_ocr)
         self.debug = False
         self.dummy_pdf_url = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+        self.logger: logging.Logger = logging.getLogger('DocumentLoader')
 
     def conntest(self, max_retries: int = 4, sleep_time: int = 3) -> None:
         """
@@ -42,18 +40,18 @@ class PDFLoader(DocumentLoader):
             try:
                 result = self.pdf_reader.read_pdf(self.dummy_pdf_url)
                 if isinstance(result.json[0], dict):
-                    logger.info("Established connection with NLM-INGESTOR at endpoint %s", self.api_url)
+                    self.logger.info("Established connection with NLM-INGESTOR at endpoint %s", self.api_url)
                     return
             except LocationValueError:
-                logger.error("Invalid API URL")
+                self.logger.error("Invalid API URL")
                 sys.exit(f"Invalid API URL: {self.api_url}")
             except (NewConnectionError, MaxRetryError) as err:
-                logger.error("NLM-INGESTOR connection test failed with an error", exc_info=err.args[0])
+                self.logger.error("NLM-INGESTOR connection test failed with an error", exc_info=err.args[0])
 
             retried += 1
             time.sleep(sleep_time)
 
-        logger.error("NLM-INGESTOR connection test failed after retries. Exiting.")
+        self.logger.error("NLM-INGESTOR connection test failed after retries. Exiting.")
         sys.exit(1)
 
     def chunk_pdf_content(self, doc: Sherpa_Document, file_name: str) -> list[Langchain_Document]:
@@ -68,7 +66,7 @@ class PDFLoader(DocumentLoader):
                     if "This is where services like" in e.text:
                         print(i, "got ya")
         except Exception as err:
-            logger.error("Error in unstructured partition_html", exc_info=err.args[0])
+            self.logger.error("Error in unstructured partition_html", exc_info=err.args[0])
             return []
 
         chunks = chunk_by_title(
@@ -77,7 +75,7 @@ class PDFLoader(DocumentLoader):
             include_orig_elements=True,  # used for metadata gathering
             max_characters=150_000
         )
-        logger.debug("created %s chunks from %s", len(chunks), file_name)
+        self.logger.debug("created %s chunks from %s", len(chunks), file_name)
 
         if self.debug:
             for chunk in chunks:
@@ -109,14 +107,14 @@ class PDFLoader(DocumentLoader):
         if blocks := response_json["return_dict"]["result"]["blocks"]:
             return Sherpa_Document(blocks)
 
-        logger.info("Could not parse %s, trying with OCR.", file_path.name)
+        self.logger.info("Could not parse %s, trying with OCR.", file_path.name)
         parser_response = self.pdf_reader_ocr._parse_pdf(pdf_file)
         response_json = json.loads(parser_response.data.decode("utf-8"))
 
         if blocks := response_json["return_dict"]["result"]["blocks"]:
             return Sherpa_Document(blocks)
 
-        logger.warning("Could not parse even with OCR, moving on...")
+        self.logger.warning("Could not parse even with OCR, moving on...")
         return None
 
     def load(self) -> list[Langchain_Document]:
