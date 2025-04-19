@@ -31,3 +31,10 @@
 (why do we do that? reading files for an hour then failing on the first embedding or something is a bit sketchy.)
 
 3. look into generating vectors from the metadata added (otherwise we should do some non-vector search based on the metadata)
+
+## TESTING
+ - Run tests: **`uv run pytest`**
+ - Run tests with coverage with console statistics: **`uv run pytest --cov`**
+ - Run tests with coverage with HTML statistics: **`uv run pytest --cov --cov-report=html`**
+
+Open `htmlcov/index.html` in any browser to see uncovered implementation.
