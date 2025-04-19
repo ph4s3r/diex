@@ -23,3 +23,21 @@ dependencies = [
 
 [tool.uv.sources]
 unstructured = { git = "https://github.com/ph4s3r/unstructured.git", rev = "main" }
+
+[dependency-groups]
+dev = [
+    "pycodestyle>=2.13.0",
+    "pylint>=3.3.6",
+    "pytest>=8.3.5",
+    "pytest-cov>=6.1.1",
+    "ruff>=0.11.6",
+]
+
+[tool.pylint.main]
+max-line-length = 120
+
+[tool.pytest.ini_options]
+addopts = [
+    "./tests",
+    "-vvs"
+]
