@@ -29,8 +29,9 @@ class PDFLoader(DocumentLoader):
         self.do_ocr = True
         self.pdf_reader_ocr = LayoutPDFReader(self.api_url_ocr)
         self.debug = False
+        self.dummy_pdf_url = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
 
-    def conntest(self, filepath_or_url: str, max_retries: int = 4, sleep_time: int = 3) -> None:
+    def conntest(self, max_retries: int = 4, sleep_time: int = 3) -> None:
         """
         Tries to parse a known good PDF URL like Google's
         PDF to verify if the NLM ingester is responsive.
@@ -39,7 +40,7 @@ class PDFLoader(DocumentLoader):
 
         while retried < max_retries:
             try:
-                result = self.pdf_reader.read_pdf(path_or_url=filepath_or_url)
+                result = self.pdf_reader.read_pdf(self.dummy_pdf_url)
                 if isinstance(result.json[0], dict):
                     logger.info("Established connection with NLM-INGESTOR at endpoint %s", self.api_url)
                     return
