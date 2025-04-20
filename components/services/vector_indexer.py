@@ -1,5 +1,6 @@
 import logging
 from components.interfaces.all_interfaces import DocumentLoader
+from components.interfaces.all_interfaces import SemanticChunker
 from components.interfaces.all_interfaces import DocumentSplitter
 from components.interfaces.all_interfaces import Embedder
 from components.interfaces.all_interfaces import VectorInserter
@@ -9,10 +10,12 @@ class VectorIndexer:
         self,
         document_loader: DocumentLoader,
         document_splitter: DocumentSplitter,
+        document_chunker: SemanticChunker,
         embedder: Embedder,
         vector_inserter = VectorInserter
     ):
         self.document_loader = document_loader
+        self.document_chunker = document_chunker
         self.document_splitter = document_splitter
         self.embedder = embedder
         self.vector_inserter = vector_inserter
@@ -30,8 +33,14 @@ class VectorIndexer:
         self.logger.info(f"RESULTS OF THE LOADING AND MD SPLIT IS {number_of_docs_indexed} DOCUMENTS")
         assert number_of_docs_indexed is not None and number_of_docs_indexed != 0
 
+        self.logger.info("BEGIN CHUNKING")
+        chunks = self.document_chunker.chunk(documents)
+        number_of_docs_chunked = len(chunks)
+        self.logger.info(f"RESULT OF CHUNKING IS {number_of_docs_chunked} DOCUMENTS")
+        assert number_of_docs_chunked is not None and number_of_docs_chunked != 0
+
         self.logger.info("BEGIN SPLIT")
-        split_documents = self.document_splitter.split(documents)
+        split_documents = self.document_splitter.split(chunks)
         number_of_docs_split = len(split_documents)
         self.logger.info(f"RESULTS OF THE SPLIT IS {number_of_docs_split} DOCUMENTS")
         assert number_of_docs_split is not None and number_of_docs_split != 0
