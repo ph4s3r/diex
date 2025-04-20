@@ -129,12 +129,4 @@ class PDFLoader(DocumentLoader):
                 chunks = self.chunk_pdf_content(sherpa_doc, pdf_path.name)
                 docs.extend(chunks)
 
-        if self.debug:
-            saveout = [
-                {"content-length": len(d.page_content), "content": d.page_content}
-                for d in docs
-            ]
-            with open("parsed-pdf-chunks.json", "w", encoding="utf-8") as f:
-                json.dump(saveout, f, indent=2, ensure_ascii=False)
-
         return docs
