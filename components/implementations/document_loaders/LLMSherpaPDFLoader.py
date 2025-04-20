@@ -23,7 +23,6 @@ class PDFLoader(DocumentLoader):
         self.api_url = api_url
         self.api_url_ocr = api_url_ocr
         self.pdf_reader = LayoutPDFReader(self.api_url)
-        self.do_ocr = True
         self.pdf_reader_ocr = LayoutPDFReader(self.api_url_ocr)
         self.debug = False
         self.dummy_pdf_url = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
@@ -65,8 +64,8 @@ class PDFLoader(DocumentLoader):
                 for i, e in enumerate(elements):
                     if "This is where services like" in e.text:
                         print(i, "got ya")
-        except Exception as err:
-            self.logger.error("Error in unstructured partition_html", exc_info=err.args[0])
+        except Exception:
+            self.logger.exception("Error in unstructured partition_html %s", file_name)
             return []
 
         chunks = chunk_by_title(
