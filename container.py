@@ -1,6 +1,7 @@
 from dependency_injector import containers, providers
 from components.implementations.document_loaders.UnstructuredMDLoader import UnstructuredMDLoader
 from components.implementations.document_loaders.LLMSherpaPDFLoader import PDFLoader
+from components.implementations.semantic_chunkers.UnstructuredChunkers import UnstructuredHTMLChunker, UnstructuredMarkdownChunker
 from components.implementations.document_splitters.TiktokenRecursiveSplitter import TiktokenRecursiveSplitter
 from components.implementations.embedders.VoyageEmbedder import VoyageEmbedder
 from components.implementations.vectordb_inserters.PineConeInserter import PineConeInserter
@@ -27,7 +28,17 @@ class Container(containers.DeclarativeContainer):
             api_url=config.documentloader.api_url,
             api_url_ocr=config.documentloader.api_url_ocr
         )
-    )
+    ) 
+
+    document_chunker = providers.Selector(
+        config.file_type,
+        pdf=providers.Singleton(
+            UnstructuredHTMLChunker
+        ),
+        markdown=providers.Singleton(
+            UnstructuredMarkdownChunker
+        )
+    )    
     
     document_splitter = providers.Singleton(
         TiktokenRecursiveSplitter,
@@ -55,6 +66,7 @@ class Container(containers.DeclarativeContainer):
         VectorIndexer,
         embedder=embedder,
         document_loader=document_loader,
+        document_chunker=document_chunker,
         document_splitter=document_splitter,
         vector_inserter=vector_inserter
     )
