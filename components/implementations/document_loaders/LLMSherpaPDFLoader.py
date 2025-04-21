@@ -53,11 +53,11 @@ class PDFLoader(DocumentLoader):
         self.logger.error("NLM-INGESTOR connection test failed after retries. Exiting.")
         sys.exit(1)
 
-    def chunk_pdf_content(self, doc: Sherpa_Document, file_name: str) -> list[Langchain_Document]:
-        """Ingesting a Sherpa_Document, converting to HTML and parsing as HTML to a Langchain doc"""
+    def chunk_pdf_content(self, doc: Langchain_Document) -> list[Langchain_Document]:
+        """Ingesting a Langchain_Document, converting to HTML and parsing as HTML to a Langchain doc"""
         try:
             # In case of an empty Sherpa blocks it generates an empty '<html></html>'
-            elements = partition_html(text=doc.to_html())
+            elements = partition_html(text=doc.page_content)
             # v2 only works if there is a body and div doc etc.. "No <body class='Document'> or <div class='Page'> element found in the HTML.""
             # v2_elements = partition_html(text=html_doc, html_parser_version="v2", unique_element_ids=True)
             if self.debug:
@@ -65,7 +65,7 @@ class PDFLoader(DocumentLoader):
                     if "This is where services like" in e.text:
                         print(i, "got ya")
         except Exception:
-            self.logger.exception("Error in unstructured partition_html %s", file_name)
+            self.logger.exception("Error in unstructured partition_html %s", doc.metadata["source"])
             return []
 
         chunks = chunk_by_title(
@@ -74,18 +74,15 @@ class PDFLoader(DocumentLoader):
             include_orig_elements=True,  # used for metadata gathering
             max_characters=150_000
         )
-        self.logger.debug("created %s chunks from %s", len(chunks), file_name)
+        self.logger.debug("created %s chunks from %s", len(chunks), doc.metadata["source"])
 
         if self.debug:
             for chunk in chunks:
                 if "This is where services like" in chunk.text:
                     print(i, "got ya")
 
-        # Create similar metadata as in case of markdown, i.e. book title, last header / subtitle etc..
-        html_meta = {"source": file_name}
-
         return [
-            Langchain_Document(page_content=str(chunk), metadata=html_meta)
+            Langchain_Document(page_content=str(chunk), metadata=doc.metadata)
             for chunk in chunks
         ]
 
@@ -116,6 +113,13 @@ class PDFLoader(DocumentLoader):
         self.logger.warning("Could not parse even with OCR, moving on...")
         return None
 
+    def sherpa2langchain(self, sdoc: Sherpa_Document, file_path: Path) -> Langchain_Document:
+
+        return Langchain_Document(
+                    page_content=sdoc.to_html(),
+                    metadata={"source": file_path}
+                )
+
     def load(self) -> list[Langchain_Document]:
         """
         Reads all PDF files from the input dir, calls LLMSherpa PDF parser (_parse_pdf) which
@@ -126,7 +130,8 @@ class PDFLoader(DocumentLoader):
         for pdf_path in self.file_path.rglob("*.pdf"):
             sherpa_doc = self.process_pdf(pdf_path)
             if sherpa_doc:
-                chunks = self.chunk_pdf_content(sherpa_doc, pdf_path.name)
+                lc_doc = self.sherpa2langchain(sherpa_doc, pdf_path.name)
+                chunks = self.chunk_pdf_content(lc_doc)
                 docs.extend(chunks)
 
         return docs
