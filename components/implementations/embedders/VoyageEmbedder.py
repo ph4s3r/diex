@@ -9,7 +9,6 @@ from tenacity import (
     stop_after_attempt,
     wait_random_exponential,  
 )
-from typing import List
 from langchain_core.documents import Document
 
 class EmbedderAPIError(Exception):
@@ -69,7 +68,7 @@ class VoyageEmbedder(Embedder):
                 time.sleep(3)
 
 
-    def embed(self, documents: List["Document"]) -> List[List[float]]:
+    def embed(self, documents: list["Document"]) -> list[list[float]]:
         self.logger.info("Embedding starts with Voyage EMBEDDING API in batches")
         batch_size = self.batch_size  # star using max allowed, to reduce RPM, then if we hit TPM, lower it
         all_embeddings = []
@@ -78,7 +77,7 @@ class VoyageEmbedder(Embedder):
         
         # tenacity exponential backoff per batch
         @retry(wait=wait_random_exponential(multiplier=1, max=60), stop=stop_after_attempt(6))
-        def embed_batch(texts_batch: List[str]):
+        def embed_batch(texts_batch: list[str]):
             return self.vo.embed(
                 texts=texts_batch,
                 model=self.model,           

@@ -6,7 +6,6 @@ import sys
 
 from urllib3.exceptions import NewConnectionError, MaxRetryError, LocationValueError
 from llmsherpa.readers import LayoutPDFReader, Document as Sherpa_Document
-
 from langchain_core.documents import Document as Langchain_Document
 
 from components.interfaces.all_interfaces import DocumentLoader

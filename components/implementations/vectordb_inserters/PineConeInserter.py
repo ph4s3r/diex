@@ -3,7 +3,6 @@ from components.interfaces.all_interfaces import VectorInserter
 import sys
 import time
 import logging
-from typing import List
 from pinecone.grpc import PineconeGRPC as Pinecone
 # from pinecone import Pinecone
 from langchain_core.documents import Document
@@ -45,11 +44,11 @@ class PineConeInserter(VectorInserter):
                 sys.exit(1)
         self.logger.info(f"Established connection with index at host {self.index_host}, index name: {self.index_name}")
 
-    def _batchify(self, items: List[dict], batch_size: int):
+    def _batchify(self, items: list[dict], batch_size: int):
         for i in range(0, len(items), batch_size):
             yield items[i:i + batch_size]
 
-    def insert(self, documents: List[Document], vectors: List[List[float]] = None) -> None:
+    def insert(self, documents: list[Document], vectors: list[list[float]] = None) -> None:
 
         self.conntest()
         

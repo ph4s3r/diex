@@ -1,6 +1,5 @@
 import logging
 import json
-from typing import List
 
 from langchain_core.documents import Document
 from unstructured.partition.html import partition_html
@@ -17,10 +16,10 @@ class UnstructuredHTMLChunker(SemanticChunker):
         self.logger: logging.Logger = logging.getLogger('SemanticChunker')
 
 
-    def chunk(self, docs: List[Document]) -> List[Document]:
+    def chunk(self, docs: list[Document]) -> list[Document]:
         """Ingesting a list of Langchain_Document types, and doing semantic chunking with unstructured
         """
-        return_docs: List[Document] = []
+        return_docs: list[Document] = []
 
         for doc in docs:
 
@@ -76,7 +75,7 @@ class UnstructuredMarkdownChunker(SemanticChunker):
         self.logger: logging.Logger = logging.getLogger('SemanticChunker')
 
 
-    def chunk(self, documents: List[Document]) -> List[Document]:
+    def chunk(self, documents: list[Document]) -> list[Document]:
 
         docs = documents
 
