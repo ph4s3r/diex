@@ -30,7 +30,7 @@ class VectorIndexer:
         self.logger.info("BEGIN LOADING")
         documents = self.document_loader.load()
         number_of_docs_indexed = len(documents)
-        self.logger.info(f"RESULTS OF THE LOADING AND MD SPLIT IS {number_of_docs_indexed} DOCUMENTS")
+        self.logger.info(f"RESULTS OF THE LOADING IS {number_of_docs_indexed} DOCUMENTS")
         assert number_of_docs_indexed is not None and number_of_docs_indexed != 0
 
         self.logger.info("BEGIN CHUNKING")
