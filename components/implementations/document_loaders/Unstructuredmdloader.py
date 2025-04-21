@@ -5,7 +5,7 @@ import logging
 import pprint
 from pathlib import Path
 from termcolor import cprint
-from typing import List, Optional
+from typing import Optional
 from langchain_core.documents import Document
 from unstructured.partition.md import partition_md
 from unstructured.chunking.title import chunk_by_title
@@ -38,12 +38,12 @@ class UnstructuredMDLoader(DocumentLoader):
         self.example_source_shown = False
         self.meta_source_warned = False
 
-    def load(self) -> List[Document]:
+    def load(self) -> list[Document]:
         """
         Recursively loads all Markdown files from the directory and returns them as a list of Document objects.
 
         Returns:
-            List[Document]: A list of loaded documents.
+            list[Document]: A list of loaded documents.
         """
         docs = []
 
@@ -91,7 +91,7 @@ class UnstructuredMDLoader(DocumentLoader):
 
         return kv_pairs
 
-    def _unstruct_partition_single_md(self, md_file: Path) -> Optional[List[Document]]:
+    def _unstruct_partition_single_md(self, md_file: Path) -> Optional[list[Document]]:
         # this is what we return
         result_document_list = []
 
