@@ -37,6 +37,11 @@ class UnstructuredMDLoader(DocumentLoader):
         self.example_source_shown = False
         self.meta_source_warned = False
 
+    def conntest(self) -> None:
+        """Unused function stub for compatibility
+        """
+        return None
+
     def load(self) -> list[Document]:
         """
         Recursively loads all Markdown files from the directory and returns them as a list of Document objects.
