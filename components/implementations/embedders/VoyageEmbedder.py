@@ -1,15 +1,16 @@
-from components.interfaces.all_interfaces import Embedder
-
 import sys
 import time
 import logging
+
 import voyageai
 from tenacity import (
     retry,
     stop_after_attempt,
-    wait_random_exponential,  
-)
+    wait_random_exponential
+    )
 from langchain_core.documents import Document
+
+from components.interfaces.all_interfaces import Embedder
 
 class EmbedderAPIError(Exception):
     """Custom exception for embedder API-related errors."""

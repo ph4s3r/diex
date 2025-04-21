@@ -1,11 +1,11 @@
-import sys
-sys.dont_write_bytecode = True
-
 import os
+import sys
 import pickle
+
 import pprint
 from pinecone.grpc import PineconeGRPC as Pinecone
 
+sys.dont_write_bytecode = True
 
 class PineConeClient():
 

@@ -1,11 +1,12 @@
 from dependency_injector import containers, providers
+
+from components.services.vector_indexer import VectorIndexer
 from components.implementations.document_loaders.UnstructuredMDLoader import UnstructuredMDLoader
 from components.implementations.document_loaders.LLMSherpaPDFLoader import PDFLoader
 from components.implementations.semantic_chunkers.UnstructuredChunkers import UnstructuredHTMLChunker, UnstructuredMarkdownChunker
 from components.implementations.document_splitters.TiktokenRecursiveSplitter import TiktokenRecursiveSplitter
 from components.implementations.embedders.VoyageEmbedder import VoyageEmbedder
 from components.implementations.vectordb_inserters.PineConeInserter import PineConeInserter
-from components.services.vector_indexer import VectorIndexer
 
 
 class Container(containers.DeclarativeContainer):

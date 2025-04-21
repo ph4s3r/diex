@@ -1,4 +1,5 @@
 import logging
+
 from components.interfaces.all_interfaces import DocumentLoader
 from components.interfaces.all_interfaces import SemanticChunker
 from components.interfaces.all_interfaces import DocumentSplitter

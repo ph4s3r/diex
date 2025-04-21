@@ -1,15 +1,16 @@
-from components.interfaces.all_interfaces import DocumentLoader
-
 import re
 import logging
-import pprint
 from pathlib import Path
-from termcolor import cprint
 from typing import Optional
+
+import pprint
+from termcolor import cprint
 from langchain_core.documents import Document
 from unstructured.partition.md import partition_md
 from unstructured.chunking.title import chunk_by_title
 from unstructured.staging.base import elements_from_base64_gzipped_json
+
+from components.interfaces.all_interfaces import DocumentLoader
 
 
 class UnstructuredMDLoader(DocumentLoader):
