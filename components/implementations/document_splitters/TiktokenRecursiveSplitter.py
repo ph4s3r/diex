@@ -1,8 +1,9 @@
-from components.interfaces.all_interfaces import DocumentSplitter
-
 from uuid import uuid3, NAMESPACE_DNS
+
 from langchain_core.documents import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+from components.interfaces.all_interfaces import DocumentSplitter
 
 class TiktokenRecursiveSplitter(DocumentSplitter):
     def __init__(self, 

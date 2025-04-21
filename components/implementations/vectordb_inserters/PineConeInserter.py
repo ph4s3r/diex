@@ -1,11 +1,11 @@
-from components.interfaces.all_interfaces import VectorInserter
-
 import sys
 import time
 import logging
-from pinecone.grpc import PineconeGRPC as Pinecone
-# from pinecone import Pinecone
+
 from langchain_core.documents import Document
+from pinecone.grpc import PineconeGRPC as Pinecone # or just from pinecone import Pinecone for non-grpc
+
+from components.interfaces.all_interfaces import VectorInserter
 
 
 class PineConeInserter(VectorInserter):
