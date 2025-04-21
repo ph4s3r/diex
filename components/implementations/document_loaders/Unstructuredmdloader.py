@@ -21,15 +21,13 @@ class UnstructuredMDLoader(DocumentLoader):
             version: str = ""
             ) -> None:
         """
-        Initializes the MarkdownLoader with a directory path and optional max_workers for parallel loading.
+        Initializes the MarkdownLoader with a directory path for parallel loading.
         https://python.langchain.com/api_reference/core/documents/langchain_core.documents.base.Document.html#langchain_core.documents.base.Document
         https://python.langchain.com/docs/integrations/document_loaders/unstructured_markdown/
         https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.markdown.UnstructuredMarkdownLoader.html
 
         Args:
             file_path (str): The path to the directory containing Markdown files.
-            max_workers (Optional[int]): The maximum number of threads to use for parallel loading.
-                                        Defaults to the number of processors on the machine, multiplied by 5.
         """
         self.project = project
         self.version = version
