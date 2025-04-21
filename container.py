@@ -19,7 +19,6 @@ class Container(containers.DeclarativeContainer):
         markdown=providers.Singleton(
             UnstructuredMDLoader,
             file_path=config.documentloader.file_path,
-            max_workers=config.documentloader.max_workers,
             project=config.documentloader.project,
             version=config.documentloader.version
         ),

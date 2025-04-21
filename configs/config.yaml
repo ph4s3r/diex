@@ -1,14 +1,13 @@
-file_type: pdf                                             # options: markdown, pdf, txt
+file_type: markdown                                             # options: markdown, pdf, txt
 embedding_type: openai                                          # options: openai, other_embedding_service
 
 
 documentloader:
   # file_path: "/home/peet/dev/azure-docs-md/"                  # absolute nix
-  # file_path: "C:\\dev\\azure-docs\\articles\\virtual-network"   # absolute win
-  file_path: "C:\\dev\\pdfs"
+  file_path: "C:\\dev\\azure-docs\\articles\\virtual-network"   # absolute win
+  # file_path: "C:\\dev\\pdfs"
   # file_path: "files/"                                         # relative
   # file_path: 'G:\\dev\\azure-docs\\articles\\deployment-environments\\'
-  max_workers: 140
   project: https://github.com/MicrosoftDocs/azure-docs/         # we generate a source metadata from project+location
   version: "tree/main/"
   # LLMSherpa SERVER is not working anymore, need to run the backend  locally:
