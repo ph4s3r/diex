@@ -58,7 +58,7 @@ class PDFLoader(DocumentLoader):
         with open(file_path, "rb") as f:
             file_data = f.read()
 
-        pdf_file = (file_path.name, file_data, "application/pdf")
+        pdf_file = (file_path.stem, file_data, "application/pdf")
 
         # No try-except block, haven't seen throwing exception even in case of a raster PDF
         # It returns with: {'return_dict': {'num_pages': 0, 'page_dim': [595.28, 841.89],
@@ -70,17 +70,17 @@ class PDFLoader(DocumentLoader):
         if blocks := response_json["return_dict"]["result"]["blocks"]:
             return Langchain_Document(
                     page_content=Sherpa_Document(blocks).to_html(),
-                    metadata={"source": file_path}
+                    metadata={"source": file_path.stem}
                 )
 
-        self.logger.info("Could not parse %s, trying with OCR.", file_path.name)
+        self.logger.info("Could not parse %s, trying with OCR.", file_path.stem)
         parser_response = self.pdf_reader_ocr._parse_pdf(pdf_file)
         response_json = json.loads(parser_response.data.decode("utf-8"))
 
         if blocks := response_json["return_dict"]["result"]["blocks"]:
             return Langchain_Document(
                     page_content=Sherpa_Document(blocks).to_html(),
-                    metadata={"source": file_path}
+                    metadata={"source": file_path.stem}
                 )
 
         self.logger.warning("Could not parse even with OCR, moving on...")

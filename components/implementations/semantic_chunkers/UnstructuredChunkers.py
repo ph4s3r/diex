@@ -3,7 +3,6 @@ import json
 import logging
 
 import pprint
-from termcolor import cprint
 from langchain_core.documents import Document
 from unstructured.partition.md import partition_md
 from unstructured.partition.html import partition_html
@@ -39,7 +38,7 @@ class UnstructuredHTMLChunker(SemanticChunker):
                             print(i, "got ya")
             except Exception:
                 self.logger.exception("Error in unstructured partition_html %s", doc.metadata["source"])
-                break
+                continue
 
             chunks = chunk_by_title(
                 elements,
@@ -50,7 +49,7 @@ class UnstructuredHTMLChunker(SemanticChunker):
             self.logger.debug("created %s chunks from %s", len(chunks), doc.metadata["source"])
 
             if self.debug:
-                for chunk in chunks:
+                for i, chunk in enumerate(chunks):
                     if "This is where services like" in chunk.text:
                         print(i, "got ya")
 
@@ -63,7 +62,7 @@ class UnstructuredHTMLChunker(SemanticChunker):
                     json.dump(saveout, f, indent=2, ensure_ascii=False)
 
             chunk_doc_list = [
-                Document(page_content=str(chunk), metadata=doc.metadata)
+                Document(page_content=chunk.text, metadata=doc.metadata)
                 for chunk in chunks
             ]
 
@@ -108,14 +107,14 @@ class UnstructuredMarkdownChunker(SemanticChunker):
         return kv_pairs
 
 
-    def chunk(self, documents = list[Document]) -> list[Document]:
+    def chunk(self, documents: list[Document]) -> list[Document]:
         # this is what we return
-        result_document_list = []
+        return_docs: list[Document] = []
         errored_docs = []
 
-        for i, doc in enumerate(documents):
+        for doc in documents:
 
-            md_meta = doc.metadata
+            md_meta = doc.metadata.copy()
 
             try:
                 elements = partition_md(text=doc.page_content)
@@ -125,10 +124,10 @@ class UnstructuredMarkdownChunker(SemanticChunker):
                 # 'lxml.etree._ProcessingInstruction' object has no attribute 'is_phrasing'
                 errored_docs.append(md_meta["source"])
                 continue
-            except Exception as e:
+            except Exception:
                 src = md_meta["source"]
-                self.logger.error(f"Skipping processing markdown file of {src}: {e}")
-                errored_docs.append(md_meta["source"])
+                self.logger.exception("Error processing md file %s", src)
+                errored_docs.append(src)
                 continue
             
             # all microsoft learn docs start with a special header, we try to process these 3 first elements automatically
@@ -138,6 +137,7 @@ class UnstructuredMarkdownChunker(SemanticChunker):
             ):
                 try:
                     msheaders = self._text_to_kv(elements[0].text)
+                    # TODO: why do we remove this?
                     elements.pop(0).text
                     md_meta.update(msheaders)
                 except Exception as e:
@@ -152,7 +152,7 @@ class UnstructuredMarkdownChunker(SemanticChunker):
                             md_meta["intent"] = intent
                             elements.pop(0)
                         # then try another way
-                        except:
+                        except:  # noqa: E722
                             try:
                                 md_meta["intent"] = elements[0].text
                                 elements.pop(0)
@@ -180,7 +180,7 @@ class UnstructuredMarkdownChunker(SemanticChunker):
             for chunk in chunks:
                 md_h_list = [""] * 6  # markdown headers have a max depth of 6
                 md_h_list[0] = md_meta.get("main_header", "")
-                chunk_meta = md_meta
+                chunk_meta = md_meta.copy()
                 chunk_inmeta = chunk.metadata.to_dict()
                 orig_elements = elements_from_base64_gzipped_json(
                     chunk_inmeta["orig_elements"]
@@ -221,20 +221,25 @@ class UnstructuredMarkdownChunker(SemanticChunker):
                             f"header_{i}": value for i, value in enumerate(md_h_list)
                         }
                         chunk_meta.update(markdown_header_struct_dict)
-                    result_document_list.append(
-                        Document(page_content=str(chunk), metadata=chunk_meta)
+                    return_docs.append(
+                        Document(page_content=chunk.text, metadata=chunk_meta)
                     )
                     if self.debug:
-                        cprint("  CHUNK META:", "red")
-                        pprint.pprint(chunk_meta)
-                        cprint("  DOC page_content:", "red")
-                        cprint(str(chunk), "green")
-                        cprint("\n\n" + "-" * 80, "red")
+                        try:
+                            from termcolor import cprint
+                            cprint("  CHUNK META:", "red")
+                            pprint.pprint(chunk_meta)
+                            cprint("  DOC page_content:", "red")
+                            cprint(chunk.text, "green")
+                            cprint("\n\n" + "-" * 80, "red")
+                        except ImportError:
+                            self.logger.warning("from termcolor import cprint cannot be imported, no chunk DEBUG info can be displayed")
+                            pass
 
         if self.debug:
             saveout = [
                 {"content-length": len(d.page_content), "content": d.page_content}
-                for d in result_document_list
+                for d in return_docs
             ]
             with open("parsed-md-chunks.json", "w", encoding="utf-8") as f:
                 json.dump(saveout, f, indent=2, ensure_ascii=False)
@@ -244,4 +249,4 @@ class UnstructuredMarkdownChunker(SemanticChunker):
             for ed in errored_docs:
                 self.logger.warning(ed)
 
-        return result_document_list
+        return return_docs
