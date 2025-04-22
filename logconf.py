@@ -94,7 +94,7 @@ def setup_logging(logs_dir: Path = Path('logs')):
     # Declare loggers and their loglevels here
     add_file_and_stdout_handler('VectorIndexer', logging.INFO)
     add_file_and_stdout_handler('DocumentLoader', logging.INFO)
-    add_file_and_stdout_handler('SemanticChunker', logging.DEBUG)
+    add_file_and_stdout_handler('SemanticChunker', logging.INFO)
     add_file_only_handler('unstructured', logging.INFO)
     add_file_and_stdout_handler('Splitter', logging.INFO)
     add_file_and_stdout_handler('Embedder', logging.INFO)

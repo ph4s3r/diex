@@ -36,7 +36,9 @@ class Container(containers.DeclarativeContainer):
             UnstructuredHTMLChunker
         ),
         markdown=providers.Singleton(
-            UnstructuredMarkdownChunker
+            UnstructuredMarkdownChunker,
+            project=config.documentloader.project,
+            version=config.documentloader.version
         )
     )    
     
