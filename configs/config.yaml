@@ -16,11 +16,11 @@ documentloader:
 
 metadata:
   # the format of microsoft docs should be like the github repos e.g. "entra-docs" etc...
-  # index date is always "dd/mm/yyyy"
+  # index date is always "mm/dd/yyyy"
   # source formats are pdf, markdown, html etc...
   main.category: "microsoft-docs"
   sub.category: "azure-docs"
-  index.date: "20/05/2025"
+  index.date: "05/20/2025"
   requestor: "peet"
   source.format: "markdown"
 
