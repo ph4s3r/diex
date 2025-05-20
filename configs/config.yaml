@@ -2,7 +2,7 @@ file_type: markdown                                             # options: markd
 
 documentloader:
   # file_path: "/home/peet/dev/azure-docs-md/"                  # absolute nix
-  file_path: "C:\\dev\\azure-docs\\articles\\virtual-network"   # absolute win
+  file_path: "C:\\dev\\azure-docs\\articles"                    # absolute win
   # file_path: "C:\\dev\\pdfs"
   # file_path: "files/"                                         # relative
   # file_path: 'G:\\dev\\azure-docs\\articles\\deployment-environments\\'
@@ -16,7 +16,7 @@ documentloader:
 
 metadata:
   # the format of microsoft docs should be like the github repos e.g. "entra-docs" etc...
-  # index date is always "mm/dd/yyyy"
+  # index date is always "mm/dd/yyyy" same as the ms.date in ms-docs
   # source formats are pdf, markdown, html etc...
   main.category: "microsoft-docs"
   sub.category: "azure-docs"
