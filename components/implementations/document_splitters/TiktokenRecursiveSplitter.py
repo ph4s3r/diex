@@ -1,9 +1,9 @@
-from components.interfaces.all_interfaces import DocumentSplitter
-
-from typing import List
 from uuid import uuid3, NAMESPACE_DNS
+
 from langchain_core.documents import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+from components.interfaces.all_interfaces import DocumentSplitter
 
 class TiktokenRecursiveSplitter(DocumentSplitter):
     def __init__(self, 
@@ -22,7 +22,7 @@ class TiktokenRecursiveSplitter(DocumentSplitter):
         )
 
 
-    def split(self, documents: List[Document]) -> List[Document]:
+    def split(self, documents: list[Document]) -> list[Document]:
         """Splits documents by tokens with LangChain's RecursiveCharacterTextSplitter using tiktoken
         """
 

@@ -1,10 +1,12 @@
 from dependency_injector import containers, providers
+
+from components.services.vector_indexer import VectorIndexer
 from components.implementations.document_loaders.UnstructuredMDLoader import UnstructuredMDLoader
 from components.implementations.document_loaders.LLMSherpaPDFLoader import PDFLoader
+from components.implementations.semantic_chunkers.UnstructuredChunkers import UnstructuredHTMLChunker, UnstructuredMarkdownChunker
 from components.implementations.document_splitters.TiktokenRecursiveSplitter import TiktokenRecursiveSplitter
 from components.implementations.embedders.VoyageEmbedder import VoyageEmbedder
 from components.implementations.vectordb_inserters.PineConeInserter import PineConeInserter
-from components.services.vector_indexer import VectorIndexer
 
 
 class Container(containers.DeclarativeContainer):
@@ -17,7 +19,6 @@ class Container(containers.DeclarativeContainer):
         markdown=providers.Singleton(
             UnstructuredMDLoader,
             file_path=config.documentloader.file_path,
-            max_workers=config.documentloader.max_workers,
             project=config.documentloader.project,
             version=config.documentloader.version
         ),
@@ -27,7 +28,19 @@ class Container(containers.DeclarativeContainer):
             api_url=config.documentloader.api_url,
             api_url_ocr=config.documentloader.api_url_ocr
         )
-    )
+    ) 
+
+    document_chunker = providers.Selector(
+        config.file_type,
+        pdf=providers.Singleton(
+            UnstructuredHTMLChunker
+        ),
+        markdown=providers.Singleton(
+            UnstructuredMarkdownChunker,
+            project=config.documentloader.project,
+            version=config.documentloader.version
+        )
+    )    
     
     document_splitter = providers.Singleton(
         TiktokenRecursiveSplitter,
@@ -49,12 +62,14 @@ class Container(containers.DeclarativeContainer):
         index_name=config.pinecone.index_name,
         index_host_suffix=config.pinecone.index_host_suffix,
         namespace=config.pinecone.namespace,
+        metadata=config.metadata
     )
 
     vector_indexer_service = providers.Singleton(
         VectorIndexer,
         embedder=embedder,
         document_loader=document_loader,
+        document_chunker=document_chunker,
         document_splitter=document_splitter,
         vector_inserter=vector_inserter
     )

@@ -6,8 +6,6 @@ import sys
 
 from urllib3.exceptions import NewConnectionError, MaxRetryError, LocationValueError
 from llmsherpa.readers import LayoutPDFReader, Document as Sherpa_Document
-from unstructured.partition.html import partition_html
-from unstructured.chunking.title import chunk_by_title
 from langchain_core.documents import Document as Langchain_Document
 
 from components.interfaces.all_interfaces import DocumentLoader
@@ -24,7 +22,6 @@ class PDFLoader(DocumentLoader):
         self.api_url_ocr = api_url_ocr
         self.pdf_reader = LayoutPDFReader(self.api_url)
         self.pdf_reader_ocr = LayoutPDFReader(self.api_url_ocr)
-        self.debug = False
         self.dummy_pdf_url = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
         self.logger: logging.Logger = logging.getLogger('DocumentLoader')
 
@@ -53,48 +50,15 @@ class PDFLoader(DocumentLoader):
         self.logger.error("NLM-INGESTOR connection test failed after retries. Exiting.")
         sys.exit(1)
 
-    def chunk_pdf_content(self, doc: Sherpa_Document, file_name: str) -> list[Langchain_Document]:
-        """Ingesting a Sherpa_Document, converting to HTML and parsing as HTML to a Langchain doc"""
-        try:
-            # In case of an empty Sherpa blocks it generates an empty '<html></html>'
-            elements = partition_html(text=doc.to_html())
-            # v2 only works if there is a body and div doc etc.. "No <body class='Document'> or <div class='Page'> element found in the HTML.""
-            # v2_elements = partition_html(text=html_doc, html_parser_version="v2", unique_element_ids=True)
-            if self.debug:
-                for i, e in enumerate(elements):
-                    if "This is where services like" in e.text:
-                        print(i, "got ya")
-        except Exception:
-            self.logger.exception("Error in unstructured partition_html %s", file_name)
-            return []
-
-        chunks = chunk_by_title(
-            elements,
-            combine_text_under_n_chars=200,
-            include_orig_elements=True,  # used for metadata gathering
-            max_characters=150_000
-        )
-        self.logger.debug("created %s chunks from %s", len(chunks), file_name)
-
-        if self.debug:
-            for chunk in chunks:
-                if "This is where services like" in chunk.text:
-                    print(i, "got ya")
-
-        # Create similar metadata as in case of markdown, i.e. book title, last header / subtitle etc..
-        html_meta = {"source": file_name}
-
-        return [
-            Langchain_Document(page_content=str(chunk), metadata=html_meta)
-            for chunk in chunks
-        ]
 
     def process_pdf(self, file_path: Path) -> Sherpa_Document | None:
-        """Read PDF file with Sherpa."""
+        """Read PDF file with Sherpa: Creates the llmsherpa.readers.Document format from the PDF, 
+        converts it to HTML and encapsulates it into a LangChain Document format
+        """
         with open(file_path, "rb") as f:
             file_data = f.read()
 
-        pdf_file = (file_path.name, file_data, "application/pdf")
+        pdf_file = (file_path.stem, file_data, "application/pdf")
 
         # No try-except block, haven't seen throwing exception even in case of a raster PDF
         # It returns with: {'return_dict': {'num_pages': 0, 'page_dim': [595.28, 841.89],
@@ -104,37 +68,34 @@ class PDFLoader(DocumentLoader):
 
         # blocks are the extracted elements. If there are none, the reading has failed
         if blocks := response_json["return_dict"]["result"]["blocks"]:
-            return Sherpa_Document(blocks)
+            return Langchain_Document(
+                    page_content=Sherpa_Document(blocks).to_html(),
+                    metadata={"source": file_path.stem}
+                )
 
-        self.logger.info("Could not parse %s, trying with OCR.", file_path.name)
+        self.logger.info("Could not parse %s, trying with OCR.", file_path.stem)
         parser_response = self.pdf_reader_ocr._parse_pdf(pdf_file)
         response_json = json.loads(parser_response.data.decode("utf-8"))
 
         if blocks := response_json["return_dict"]["result"]["blocks"]:
-            return Sherpa_Document(blocks)
+            return Langchain_Document(
+                    page_content=Sherpa_Document(blocks).to_html(),
+                    metadata={"source": file_path.stem}
+                )
 
         self.logger.warning("Could not parse even with OCR, moving on...")
         return None
 
+
     def load(self) -> list[Langchain_Document]:
         """
-        Reads all PDF files from the input dir, calls LLMSherpa PDF parser (_parse_pdf) which
-        outputs llmsherpa.readers.Document formats, then pass to unstructured to parse it as HTML
+        Reads all PDF files from the input dir, calls LLMSherpa PDF parser (process_pdf) 
+        and puts the returned Langchain_Documents into a list (one per PDF)
         """
         docs = []
 
         for pdf_path in self.file_path.rglob("*.pdf"):
-            sherpa_doc = self.process_pdf(pdf_path)
-            if sherpa_doc:
-                chunks = self.chunk_pdf_content(sherpa_doc, pdf_path.name)
-                docs.extend(chunks)
-
-        if self.debug:
-            saveout = [
-                {"content-length": len(d.page_content), "content": d.page_content}
-                for d in docs
-            ]
-            with open("parsed-pdf-chunks.json", "w", encoding="utf-8") as f:
-                json.dump(saveout, f, indent=2, ensure_ascii=False)
+            langchain_doc = self.process_pdf(pdf_path)
+            docs.append(langchain_doc)
 
         return docs

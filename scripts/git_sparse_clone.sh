@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #####
-#   about: Script to clone a git repo sparesely: filter for markdowns only
+#   about: Script to clone a git repo sparsely: filter for markdowns only
 #  author: Peter Karacsonyi <peterkaracsonyi85@gmail.com>
 #    date: 24 Nov 2024
 # license: GNU General Public License, version 2

@@ -1,12 +1,11 @@
-from components.interfaces.all_interfaces import VectorInserter
-
 import sys
 import time
 import logging
-from typing import List
-from pinecone.grpc import PineconeGRPC as Pinecone
-# from pinecone import Pinecone
+
 from langchain_core.documents import Document
+from pinecone.grpc import PineconeGRPC as Pinecone # or just from pinecone import Pinecone for non-grpc
+
+from components.interfaces.all_interfaces import VectorInserter
 
 
 class PineConeInserter(VectorInserter):
@@ -17,7 +16,8 @@ class PineConeInserter(VectorInserter):
                  api_key,
                  index_name,
                  namespace,
-                 index_host_suffix
+                 index_host_suffix,
+                 metadata
     ) -> None:
 
         self.api_key = api_key
@@ -30,7 +30,7 @@ class PineConeInserter(VectorInserter):
         self.pc = Pinecone(api_key=self.api_key)
         self.index = self.pc.Index(host=self.index_host)
 
-        
+        self.metadata = metadata
 
     def conntest(self, max_retries: int = 4):
 
@@ -45,11 +45,11 @@ class PineConeInserter(VectorInserter):
                 sys.exit(1)
         self.logger.info(f"Established connection with index at host {self.index_host}, index name: {self.index_name}")
 
-    def _batchify(self, items: List[dict], batch_size: int):
+    def _batchify(self, items: list[dict], batch_size: int):
         for i in range(0, len(items), batch_size):
             yield items[i:i + batch_size]
 
-    def insert(self, documents: List[Document], vectors: List[List[float]] = None) -> None:
+    def insert(self, documents: list[Document], vectors: list[list[float]] = None) -> None:
 
         self.conntest()
         
@@ -80,8 +80,8 @@ class PineConeInserter(VectorInserter):
         embeddings = []
 
         for doc, vec in zip(documents, vectors):
-            meta = doc.metadata
-            meta.update({"content": doc.page_content})
+            # here we merge the two dicts + add the content
+            meta = {**self.metadata, **doc.metadata, "content": doc.page_content}
             embeddings.append({
                 "id": doc.id,
                 "values": vec,

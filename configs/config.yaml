@@ -1,14 +1,11 @@
-file_type: pdf                                             # options: markdown, pdf, txt
-embedding_type: openai                                          # options: openai, other_embedding_service
-
+file_type: markdown                                             # options: markdown, pdf, txt
 
 documentloader:
   # file_path: "/home/peet/dev/azure-docs-md/"                  # absolute nix
-  # file_path: "C:\\dev\\azure-docs\\articles\\virtual-network"   # absolute win
-  file_path: "C:\\dev\\pdfs"
+  file_path: "C:\\dev\\azure-docs\\articles\\virtual-network"   # absolute win
+  # file_path: "C:\\dev\\pdfs"
   # file_path: "files/"                                         # relative
   # file_path: 'G:\\dev\\azure-docs\\articles\\deployment-environments\\'
-  max_workers: 140
   project: https://github.com/MicrosoftDocs/azure-docs/         # we generate a source metadata from project+location
   version: "tree/main/"
   # LLMSherpa SERVER is not working anymore, need to run the backend  locally:
@@ -16,6 +13,16 @@ documentloader:
   # docker run -p 5010:5001 ghcr.io/nlmatics/nlm-ingestor:latest # (this is just for dev)
   api_url: "http://localhost:5010/api/parseDocument?renderFormat=all"
   api_url_ocr: "http://localhost:5010/api/parseDocument?renderFormat=all&applyOcr=yes"
+
+metadata:
+  # the format of microsoft docs should be like the github repos e.g. "entra-docs" etc...
+  # index date is always "mm/dd/yyyy"
+  # source formats are pdf, markdown, html etc...
+  main.category: "microsoft-docs"
+  sub.category: "azure-docs"
+  index.date: "05/20/2025"
+  requestor: "peet"
+  source.format: "markdown"
 
 
 splitter:
@@ -35,4 +42,4 @@ embedder:
 pinecone:
   index_name: voyage1024
   index_host_suffix: 226a147.svc.aped-4627-b74a.pinecone.io # need to be something like 226a147.svc.aped-4627-b74a.pinecone.io
-  namespace: vnets1024 # namespace is created automatically if not exists
+  namespace: ms-docs # namespace is created automatically if not exists
