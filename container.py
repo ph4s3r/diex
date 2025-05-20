@@ -62,6 +62,7 @@ class Container(containers.DeclarativeContainer):
         index_name=config.pinecone.index_name,
         index_host_suffix=config.pinecone.index_host_suffix,
         namespace=config.pinecone.namespace,
+        metadata=config.metadata
     )
 
     vector_indexer_service = providers.Singleton(

@@ -1,6 +1,4 @@
 file_type: markdown                                             # options: markdown, pdf, txt
-embedding_type: openai                                          # options: openai, other_embedding_service
-
 
 documentloader:
   # file_path: "/home/peet/dev/azure-docs-md/"                  # absolute nix
@@ -15,6 +13,16 @@ documentloader:
   # docker run -p 5010:5001 ghcr.io/nlmatics/nlm-ingestor:latest # (this is just for dev)
   api_url: "http://localhost:5010/api/parseDocument?renderFormat=all"
   api_url_ocr: "http://localhost:5010/api/parseDocument?renderFormat=all&applyOcr=yes"
+
+metadata:
+  # the format of microsoft docs should be like the github repos e.g. "entra-docs" etc...
+  # index date is always "dd/mm/yyyy"
+  # source formats are pdf, markdown, html etc...
+  main.category: "microsoft-docs"
+  sub.category: "azure-docs"
+  index.date: "20/05/2025"
+  requestor: "peet"
+  source.format: "markdown"
 
 
 splitter:
@@ -34,4 +42,4 @@ embedder:
 pinecone:
   index_name: voyage1024
   index_host_suffix: 226a147.svc.aped-4627-b74a.pinecone.io # need to be something like 226a147.svc.aped-4627-b74a.pinecone.io
-  namespace: vnets1024 # namespace is created automatically if not exists
+  namespace: ms-docs # namespace is created automatically if not exists

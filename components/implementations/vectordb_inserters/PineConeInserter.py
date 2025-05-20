@@ -16,7 +16,8 @@ class PineConeInserter(VectorInserter):
                  api_key,
                  index_name,
                  namespace,
-                 index_host_suffix
+                 index_host_suffix,
+                 metadata
     ) -> None:
 
         self.api_key = api_key
@@ -29,7 +30,7 @@ class PineConeInserter(VectorInserter):
         self.pc = Pinecone(api_key=self.api_key)
         self.index = self.pc.Index(host=self.index_host)
 
-        
+        self.metadata = metadata
 
     def conntest(self, max_retries: int = 4):
 
@@ -79,8 +80,8 @@ class PineConeInserter(VectorInserter):
         embeddings = []
 
         for doc, vec in zip(documents, vectors):
-            meta = doc.metadata
-            meta.update({"content": doc.page_content})
+            # here we merge the two dicts + add the content
+            meta = {**self.metadata, **doc.metadata, "content": doc.page_content}
             embeddings.append({
                 "id": doc.id,
                 "values": vec,
