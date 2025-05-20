@@ -23,6 +23,7 @@ metadata:
   index.date: "05/20/2025"
   requestor: "peet"
   source.format: "markdown"
+  source.url: "https://learn.microsoft.com/en-us/azure"
 
 
 splitter:
