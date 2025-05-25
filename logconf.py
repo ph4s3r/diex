@@ -95,14 +95,14 @@ def setup_logging(logs_dir: Path = Path('logs')):
     add_file_and_stdout_handler('VectorIndexer', logging.INFO)
     add_file_and_stdout_handler('DocumentLoader', logging.INFO)
     add_file_and_stdout_handler('SemanticChunker', logging.INFO)
-    add_file_only_handler('unstructured', logging.INFO)
+    # add_file_only_handler('unstructured', logging.INFO)
     add_file_and_stdout_handler('Splitter', logging.INFO)
     add_file_and_stdout_handler('Embedder', logging.INFO)
     add_file_and_stdout_handler('Inserter', logging.INFO)
 
     # **Add loggers for torch and sentence_transformers**
-    add_file_and_stdout_handler('torch', logging.WARNING)  # Set to WARNING to reduce verbosity
-    add_file_and_stdout_handler('sentence_transformers', logging.INFO)
+    # add_file_and_stdout_handler('torch', logging.WARNING)  # Set to WARNING to reduce verbosity
+    # add_file_and_stdout_handler('sentence_transformers', logging.INFO)
 
     main_logger.info(f"Log folder: {run_dir}")
 
