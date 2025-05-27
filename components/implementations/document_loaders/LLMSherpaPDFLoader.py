@@ -13,11 +13,10 @@ from components.interfaces.all_interfaces import DocumentLoader
 
 class PDFLoader(DocumentLoader):
 
-    def __init__(self, file_path: str, api_url: str, api_url_ocr: str) -> None:
-        self.file_path = Path(file_path)
-        if not self.file_path.is_dir():
-            sys.exit(f"The PDF source folder ({file_path}) is not a valid directory!")
-
+    # file_source accepting multiple data types requires python 3.10+ (Union)
+    # a universal reader can pass a list of strings of paths now to this as well
+    def __init__(self, file_source: str | list, api_url: str, api_url_ocr: str) -> None:
+        self.file_source = file_source
         self.api_url = api_url
         self.api_url_ocr = api_url_ocr
         self.pdf_reader = LayoutPDFReader(self.api_url)
@@ -94,7 +93,16 @@ class PDFLoader(DocumentLoader):
         """
         docs = []
 
-        for pdf_path in self.file_path.rglob("*.pdf"):
+        pdf_paths = None
+        if isinstance(self.file_source, str):
+            self.file_source = Path(self.file_source)
+            if not self.file_source.is_dir():
+                sys.exit(f"The PDF source folder ({self.file_source}) is not a valid directory!")
+            pdf_paths = [Path(pdf) for pdf in self.file_source.rglob("*.pdf")]
+        else:
+            pdf_paths = [Path(pdf) for pdf in self.file_source]
+
+        for pdf_path in pdf_paths:
             langchain_doc = self.process_pdf(pdf_path)
             docs.append(langchain_doc)
 
