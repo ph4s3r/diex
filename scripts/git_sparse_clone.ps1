@@ -1,25 +1,71 @@
-# general project sparse checkout
-$rootdir="C:\dev"
-$project="docs-gitlab-com"
-$origin="https://gitlab.com/gitlab-org/technical-writing/$project.git"
+param(
+    [string]$RootDir = "C:\dev",
+    [string]$Project = "docs-gitlab-com",
+    [string]$Origin = "https://gitlab.com/gitlab-org/technical-writing/$Project.git",
+    [switch]$IncludePDF
+)
 
-Write-Host "Starting sparse checkout of $project from $origin into $targetDir..."
+# Confirm parameters if not passed as arguments
+if (-not $PSBoundParameters.ContainsKey('RootDir')) {
+    $confirm = Read-Host "Use default root directory '$RootDir'? (y/n)"
+    if ($confirm -eq 'n') {
+        $RootDir = Read-Host "Enter root directory"
+    }
+}
 
-Set-Location $rootdir
-git init $project
-Set-Location $project
-git remote add origin $origin
-git config core.sparseCheckout true
-New-Item -ItemType Directory -Force -Path ".git/info" | Out-Null
-"**/*.md" | Set-Content -Path ".git/info/sparse-checkout"
-git pull --depth=1 origin main
+if (-not $PSBoundParameters.ContainsKey('Project')) {
+    $confirm = Read-Host "Use default project name '$Project'? (y/n)"
+    if ($confirm -eq 'n') {
+        $Project = Read-Host "Enter project name"
+    }
+}
 
-$mdCount = (Get-ChildItem -Filter *.md -Recurse | Measure-Object).Count          # count
+if (-not $PSBoundParameters.ContainsKey('Origin')) {
+    $confirm = Read-Host "Use default origin '$Origin'? (y/n)"
+    if ($confirm -eq 'n') {
+        $Origin = Read-Host "Enter git origin URL"
+    }
+}
 
-$sizeBytes = (Get-ChildItem -Recurse | Measure-Object Length -Sum).Sum           # bytes
-$sizeMB    = [math]::Round($sizeBytes / 1MB, 2)                                  # MB (2 dp)
+Write-Host "Starting sparse checkout of $Project from $Origin into $RootDir\$Project..."
 
-Write-Host ""
-Write-Host "Checkout complete."
-Write-Host ("Markdown files pulled : {0}" -f $mdCount)
-Write-Host ("Directory size        : {0} MB ({1:N0} bytes)" -f $sizeMB, $sizeBytes)
+$originalDir = Get-Location
+
+try {
+    Set-Location $RootDir
+    git init $Project
+    Set-Location $Project
+    git remote add origin $Origin
+    git config core.sparseCheckout true
+    New-Item -ItemType Directory -Force -Path ".git/info" | Out-Null
+
+    # Configure sparse checkout to include markdown and optionally PDF files
+    if ($IncludePDF) {
+        "**/*.md", "**/*.pdf" | Set-Content -Path ".git/info/sparse-checkout"
+    } else {
+        "**/*.md" | Set-Content -Path ".git/info/sparse-checkout"
+    }
+
+    git pull --depth=1 origin main
+
+    $mdCount = (Get-ChildItem -Filter *.md -Recurse | Measure-Object).Count
+    $pdfCount = 0
+    if ($IncludePDF) {
+        $pdfCount = (Get-ChildItem -Filter *.pdf -Recurse | Measure-Object).Count
+    }
+
+    $sizeBytes = (Get-ChildItem -Recurse | Measure-Object Length -Sum).Sum
+    $sizeMB = [math]::Round($sizeBytes / 1MB, 2)
+
+    Write-Host ""
+    Write-Host "Checkout complete."
+    Write-Host ("Markdown files pulled : {0}" -f $mdCount)
+    if ($IncludePDF) {
+        Write-Host ("PDF files pulled     : {0}" -f $pdfCount)
+    }
+    Write-Host ("Directory size        : {0} MB ({1:N0} bytes)" -f $sizeMB, $sizeBytes)
+}
+finally {
+    Set-Location $originalDir
+    Write-Host "Returned to original directory: $originalDir"
+}
