@@ -19,8 +19,8 @@ class Container(containers.DeclarativeContainer):
         markdown=providers.Singleton(
             UnstructuredMDLoader,
             file_path=config.documentloader.file_path,
-            project=config.documentloader.project,
-            version=config.documentloader.version
+            url_source_stub=config.documentloader.url_source_stub,
+            url_web_stub=config.documentloader.url_web_stub,
         ),
         pdf=providers.Singleton(
             PDFLoader,
@@ -37,8 +37,8 @@ class Container(containers.DeclarativeContainer):
         ),
         markdown=providers.Singleton(
             UnstructuredMarkdownChunker,
-            project=config.documentloader.project,
-            version=config.documentloader.version
+            url_source_stub=config.documentloader.url_source_stub,
+            url_web_stub=config.documentloader.url_web_stub,
         )
     )    
     

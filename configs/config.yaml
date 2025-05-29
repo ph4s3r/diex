@@ -1,13 +1,20 @@
 file_type: markdown                                             # options: markdown, pdf, txt
 
 documentloader:
-  # file_path: "/home/peet/dev/azure-docs-md/"                  # absolute nix
-  file_path: "C:\\dev\\azure-docs\\articles"                    # absolute win
+
+  ## local path EXAMPLES
+
+  # file_path: "/home/peet/dev/azure-docs-md/"                     # absolute nix
   # file_path: "C:\\dev\\pdfs"
-  # file_path: "files/"                                         # relative
-  # file_path: 'G:\\dev\\azure-docs\\articles\\deployment-environments\\'
-  project: https://github.com/MicrosoftDocs/azure-docs/         # we generate a source metadata from project+location
-  version: "tree/main/"
+  # file_path: "files/"             
+
+  ## WEB & MD SOURCE URL building
+  ## the build_md_source_and_web_urls function builds the URLs, from the below data
+  ## you must assure that the file_path and the stub URL is at the same distance from a file
+  ## otherwise the DocumentLoader logger will log the sample meta source:
+  file_path: "C:\\dev\\sources-to-index\\azure-docs\\articles"          # absolute win
+  url_source_stub: https://github.com/MicrosoftDocs/azure-docs/tree/main/articles/ # needs to end withb slash 
+  url_web_stub: https://learn.microsoft.com/en-us/azure/
   # LLMSherpa SERVER is not working anymore, need to run the backend  locally:
   # docker pull ghcr.io/nlmatics/nlm-ingestor:latest
   # docker run -p 5010:5001 ghcr.io/nlmatics/nlm-ingestor:latest # (this is just for dev)
@@ -18,12 +25,12 @@ metadata:
   # the format of microsoft docs should be like the github repos e.g. "entra-docs" etc...
   # index date is always "mm/dd/yyyy" same as the ms.date in ms-docs
   # source formats are pdf, markdown, html etc...
-  main.category: "microsoft-docs"
-  sub.category: "azure-docs"
-  index.date: "05/20/2025"
+  main_category: "microsoft-docs"
+  sub_category: "azure-docs"
+  index_date: "05/29/2025"
   requestor: "peet"
-  source.format: "markdown"
-  source.url: "https://learn.microsoft.com/en-us/azure"
+  source_format: "markdown"
+  www: "https://learn.microsoft.com/en-us/azure"
 
 
 splitter:
@@ -41,6 +48,6 @@ embedder:
 
 
 pinecone:
-  index_name: voyage1024
+  index_name: voyage1042dev
   index_host_suffix: 226a147.svc.aped-4627-b74a.pinecone.io # need to be something like 226a147.svc.aped-4627-b74a.pinecone.io
   namespace: ms-docs # namespace is created automatically if not exists

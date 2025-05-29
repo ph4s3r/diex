@@ -75,12 +75,12 @@ class UnstructuredMarkdownChunker(SemanticChunker):
 
     def __init__(
             self,
-            project: str = "",
-            version: str = ""
+            url_source_stub: str = "",
+            url_web_stub: str = ""
             ) -> None:
 
-        self.project = project
-        self.version = version
+        self.url_source_stub = url_source_stub
+        self.url_web_stub = url_web_stub
         self.debug = False
         self.logger: logging.Logger = logging.getLogger('SemanticChunker')
 
@@ -122,18 +122,18 @@ class UnstructuredMarkdownChunker(SemanticChunker):
                 # usually there is this e.g. skipping processing markdown file of
                 # https://github.com/MicrosoftDocs/azure-docs/tree/main/articles/virtual-network/what-is-ip-address-168-63-129-16.md:
                 # 'lxml.etree._ProcessingInstruction' object has no attribute 'is_phrasing'
-                errored_docs.append(md_meta["source"])
+                errored_docs.append(md_meta["source_url"])
                 continue
             except Exception:
-                src = md_meta["source"]
+                src = md_meta["source_url"]
                 self.logger.exception("Error processing md file %s", src)
                 errored_docs.append(src)
                 continue
             
             # all microsoft learn docs start with a special header, we try to process these 3 first elements automatically
             if (
-                any(substring in self.project for substring in ["azure", "microsoft"])
-                and "includes" not in md_meta["source"]
+                any(substring in self.url_source_stub for substring in ["MicrosoftDocs"])
+                and "includes" not in md_meta["source_url"]
             ):
                 try:
                     msheaders = self._text_to_kv(elements[0].text)
@@ -141,9 +141,9 @@ class UnstructuredMarkdownChunker(SemanticChunker):
                     elements.pop(0).text
                     md_meta.update(msheaders)
                 except Exception as e:
-                    src = md_meta["source"]
+                    src = md_meta["source_url"]
                     self.logger.warning(
-                        f"Skipping processing Microsoft markdown header of {src}: {e}"
+                        f"Skipping processing MicrosoftDocs markdown header of {src}: {e}"
                     )
                 if len(elements) > 0:
                     if "intent" in elements[0].text and elements[0].category == "Title":
@@ -165,7 +165,7 @@ class UnstructuredMarkdownChunker(SemanticChunker):
                     if elements[0].category == "Title":
                         md_meta["main_header"] = elements.pop(0).text
                 else:
-                    src = md_meta["source"]
+                    src = md_meta["source_url"]
                     self.logger.warning(f"Not much stuff in here, skipping {src}")
 
             chunks = chunk_by_title(
@@ -174,7 +174,7 @@ class UnstructuredMarkdownChunker(SemanticChunker):
                 include_orig_elements=True,  # stores the elements under ["orig_elements"]
                 max_characters=5000,
             )
-            src = md_meta["source"]
+            src = md_meta["source_url"]
             self.logger.debug(f"created {len(chunks)} chunks from {src}")
 
             for chunk in chunks:
