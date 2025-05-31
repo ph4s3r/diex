@@ -1,8 +1,8 @@
 param(
     [string]$RootDir = "C:\dev\sources-to-index\",
-    [string]$Project = "defender-docs",
-    [string]$Origin = "https://github.com/MicrosoftDocs/$Project.git",
-    [string]$Ref = "public",
+    [string]$Project = "powershell-docs",
+    [string]$Origin = "https://github.com/MicrosoftDocs/PowerShell-Docs",
+    [string]$Ref = "main",
     [switch]$IncludePDF
 )
     # gitlab-example
@@ -56,14 +56,14 @@ try {
 
     # Configure sparse checkout to include markdown and optionally PDF files
     if ($IncludePDF) {
-        "**/*.md", "**/*.pdf" | Set-Content -Path ".git/info/sparse-checkout"
+        "**/*.md*", "**/*.pdf" | Set-Content -Path ".git/info/sparse-checkout"
     } else {
-        "**/*.md" | Set-Content -Path ".git/info/sparse-checkout"
+        "**/*.md*" | Set-Content -Path ".git/info/sparse-checkout"
     }
 
     git pull --depth=1 origin $Ref
 
-    $mdCount = (Get-ChildItem -Filter *.md -Recurse | Measure-Object).Count
+    $mdCount = (Get-ChildItem -Filter *.md* -Recurse | Measure-Object).Count
     $pdfCount = 0
     if ($IncludePDF) {
         $pdfCount = (Get-ChildItem -Filter *.pdf -Recurse | Measure-Object).Count
