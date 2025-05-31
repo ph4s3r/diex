@@ -1,10 +1,7 @@
 import logging
 from pathlib import Path
 
-
-
 from langchain_core.documents import Document
-
 
 from components.interfaces.all_interfaces import DocumentLoader
 
@@ -52,6 +49,8 @@ class UnstructuredMDLoader(DocumentLoader):
         try:
             md_meta["source_url"] = self.url_source_stub + str(md_file.relative_to(self.file_path)).replace("\\", "/")
             md_meta["web_url"] = self.url_web_stub + str(md_file.relative_to(self.file_path).with_suffix('')).replace("\\", "/")
+            if "_index" in md_meta["web_url"]:
+                md_meta["web_url"] = md_meta["web_url"].replace("_index", "")
         except Exception as e:
             self.meta_source_warned = True
             self.logger.warning(
