@@ -1,4 +1,5 @@
 import logging
+import requests
 from pathlib import Path
 
 from langchain_core.documents import Document
@@ -11,7 +12,8 @@ class UnstructuredMDLoader(DocumentLoader):
             self, 
             file_path: str, 
             url_source_stub: str = "",
-            url_web_stub: str = ""
+            url_web_stub: str = "",
+            url_checking: bool = True
             ) -> None:
         """
         Initializes the MarkdownLoader with a directory path for parallel loading.
@@ -27,6 +29,7 @@ class UnstructuredMDLoader(DocumentLoader):
         self.file_path: Path = Path(file_path).resolve()
         self.logger: logging.Logger = logging.getLogger("DocumentLoader")
         self.example_sources_shown = False
+        self.url_checking = url_checking
         self.debug = False
         if self.debug:
             self.example_sources_shown = True
@@ -60,6 +63,12 @@ class UnstructuredMDLoader(DocumentLoader):
             self.logger.info(f"sample source url: {md_meta['source_url']}")
             self.logger.info(f"sample web url: {md_meta['web_url']}")
             self.example_sources_shown = True
+
+        if self.url_checking:
+            r = requests.get(md_meta["web_url"])
+            if r.status_code == 404:
+                self.logger.warning(f"Got 404 for web_url {md_meta["web_url"]} ")
+
 
         return md_meta
 
