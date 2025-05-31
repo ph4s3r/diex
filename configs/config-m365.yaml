@@ -14,9 +14,10 @@ documentloader:
   ## the build_md_source_and_web_urls function builds the URLs, from the below data
   ## you must assure that the file_path and the stub URL is at the same distance from a file
   ## otherwise the DocumentLoader logger will log the sample meta source:
-  file_path: C:\\dev\\sources-to-index\\gitlab\\doc\\ci          # absolute win
-  url_source_stub: https://gitlab.com/gitlab-org/gitlab/-/tree/master/doc/ci/ # needs to end withb slash 
-  url_web_stub: https://docs.gitlab.com/ci/
+  file_path: C:\dev\\sources-to-index\\microsoft-365-docs\\microsoft-365
+  # stubs need to end with slash 
+  url_source_stub: https://github.com/MicrosoftDocs/microsoft-365-docs/tree/public/microsoft-365/ 
+  url_web_stub: https://learn.microsoft.com/en-us/microsoft-365/
   # LLMSherpa SERVER is not working anymore, need to run the backend  locally:
   # docker pull ghcr.io/nlmatics/nlm-ingestor:latest
   # docker run -p 5010:5001 ghcr.io/nlmatics/nlm-ingestor:latest # (this is just for dev)
@@ -27,12 +28,12 @@ metadata:
   # the format of microsoft docs should be like the github repos e.g. "entra-docs" etc...
   # index date is always "mm/dd/yyyy" same as the ms.date in ms-docs
   # source formats are pdf, markdown, html etc...
-  main_category: "gitlab-docs"
-  sub_category: "ci"
+  main_category: "ms-docs"
+  sub_category: "microsoft-365"
   index_date: "05/31/2025"
   requestor: "peet"
   source_format: "markdown"
-  www: "https://docs.gitlab.com/ci/"
+  www: "https://learn.microsoft.com/en-us/microsoft-365/"
 
 
 splitter:
@@ -52,4 +53,4 @@ embedder:
 pinecone:
   index_name: voyage1042dev
   index_host_suffix: 226a147.svc.aped-4627-b74a.pinecone.io # need to be something like 226a147.svc.aped-4627-b74a.pinecone.io
-  namespace: gitlab-docs # namespace is created automatically if not exists
+  namespace: ms-docs # namespace is created automatically if not exists
