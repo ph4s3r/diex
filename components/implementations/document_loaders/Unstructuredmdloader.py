@@ -13,7 +13,7 @@ class UnstructuredMDLoader(DocumentLoader):
             file_path: str, 
             url_source_stub: str = "",
             url_web_stub: str = "",
-            url_checking: bool = True
+            url_check_all: str = "False"
             ) -> None:
         """
         Initializes the MarkdownLoader with a directory path for parallel loading.
@@ -29,7 +29,7 @@ class UnstructuredMDLoader(DocumentLoader):
         self.file_path: Path = Path(file_path).resolve()
         self.logger: logging.Logger = logging.getLogger("DocumentLoader")
         self.example_sources_shown = False
-        self.url_checking = url_checking
+        self.url_check_all = url_check_all
         self.debug = False
         if self.debug:
             self.example_sources_shown = True
@@ -62,9 +62,15 @@ class UnstructuredMDLoader(DocumentLoader):
         if not self.example_sources_shown:
             self.logger.info(f"sample source url: {md_meta['source_url']}")
             self.logger.info(f"sample web url: {md_meta['web_url']}")
+            r = requests.get(md_meta["web_url"])
+            if r.status_code == 404:
+                self.logger.warning(f"Got 404 for web_url {md_meta["web_url"]} ")
+            r = requests.get(md_meta["source_url"])
+            if r.status_code == 404:
+                self.logger.warning(f"Got 404 for source_url {md_meta["source_url"]} ")
             self.example_sources_shown = True
 
-        if self.url_checking:
+        if self.url_check_all:
             r = requests.get(md_meta["web_url"])
             if r.status_code == 404:
                 self.logger.warning(f"Got 404 for web_url {md_meta["web_url"]} ")

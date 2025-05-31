@@ -21,6 +21,7 @@ class Container(containers.DeclarativeContainer):
             file_path=config.documentloader.file_path,
             url_source_stub=config.documentloader.url_source_stub,
             url_web_stub=config.documentloader.url_web_stub,
+            url_check_all=config.documentloader.url_check_all
         ),
         pdf=providers.Singleton(
             PDFLoader,

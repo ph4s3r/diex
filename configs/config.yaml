@@ -6,31 +6,33 @@ documentloader:
 
   # file_path: "/home/peet/dev/azure-docs-md/"                     # absolute nix
   # file_path: "C:\\dev\\pdfs"
-  # file_path: "files/"             
+  # file_path: "files/"      
+
+  url_check_all: False       
 
   ## WEB & MD SOURCE URL building
   ## the build_md_source_and_web_urls function builds the URLs, from the below data
   ## you must assure that the file_path and the stub URL is at the same distance from a file
   ## otherwise the DocumentLoader logger will log the sample meta source:
-  file_path: "C:\\dev\\sources-to-index\\azure-docs\\articles"          # absolute win
-  url_source_stub: https://github.com/MicrosoftDocs/azure-docs/tree/main/articles/ # needs to end withb slash 
-  url_web_stub: https://learn.microsoft.com/en-us/azure/
+  file_path: C:\\dev\\sources-to-index\\gitlab\\doc\\ci          # absolute win
+  url_source_stub: https://gitlab.com/gitlab-org/gitlab/-/tree/master/doc/ci/ # needs to end withb slash 
+  url_web_stub: https://docs.gitlab.com/ci/
   # LLMSherpa SERVER is not working anymore, need to run the backend  locally:
   # docker pull ghcr.io/nlmatics/nlm-ingestor:latest
   # docker run -p 5010:5001 ghcr.io/nlmatics/nlm-ingestor:latest # (this is just for dev)
-  api_url: "http://localhost:5010/api/parseDocument?renderFormat=all"
-  api_url_ocr: "http://localhost:5010/api/parseDocument?renderFormat=all&applyOcr=yes"
+  api_url: http://localhost:5010/api/parseDocument?renderFormat=all
+  api_url_ocr: http://localhost:5010/api/parseDocument?renderFormat=all&applyOcr=yes
 
 metadata:
   # the format of microsoft docs should be like the github repos e.g. "entra-docs" etc...
   # index date is always "mm/dd/yyyy" same as the ms.date in ms-docs
   # source formats are pdf, markdown, html etc...
-  main_category: "microsoft-docs"
-  sub_category: "azure-docs"
+  main_category: "gitlab-docs"
+  sub_category: "ci"
   index_date: "05/29/2025"
   requestor: "peet"
   source_format: "markdown"
-  www: "https://learn.microsoft.com/en-us/azure"
+  www: "https://docs.gitlab.com/ci/"
 
 
 splitter:
@@ -50,4 +52,4 @@ embedder:
 pinecone:
   index_name: voyage1042dev
   index_host_suffix: 226a147.svc.aped-4627-b74a.pinecone.io # need to be something like 226a147.svc.aped-4627-b74a.pinecone.io
-  namespace: ms-docs # namespace is created automatically if not exists
+  namespace: gitlab-docs # namespace is created automatically if not exists
