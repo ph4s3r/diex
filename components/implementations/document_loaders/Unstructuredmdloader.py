@@ -52,8 +52,19 @@ class UnstructuredMDLoader(DocumentLoader):
         try:
             md_meta["source_url"] = self.url_source_stub + str(md_file.relative_to(self.file_path)).replace("\\", "/")
             md_meta["web_url"] = self.url_web_stub + str(md_file.relative_to(self.file_path).with_suffix('')).replace("\\", "/")
+            # some edge cases :DD 
             if "_index" in md_meta["web_url"]:
                 md_meta["web_url"] = md_meta["web_url"].replace("_index", "")
+            if "ATADocs" in md_meta["web_url"]:
+                md_meta["web_url"] = md_meta["web_url"].replace("ATADocs", "advanced-threat-analytics")
+            if "ATPDocs" in md_meta["web_url"]:
+                md_meta["web_url"] = md_meta["web_url"].replace("ATPDocs", "defender-for-identity")
+            if "CloudAppSecurityDocs" in md_meta["web_url"]:
+                md_meta["web_url"] = md_meta["web_url"].replace("CloudAppSecurityDocs", "defender-cloud-apps")
+            if "exposure-management" in md_meta["web_url"]:
+                md_meta["web_url"] = md_meta["web_url"].replace("exposure-management", "security-exposure-management")
+            if "docs-conceptual" in md_meta["web_url"]:
+                md_meta["web_url"] = md_meta["web_url"].replace("docs-conceptual", "scripting")
         except Exception as e:
             self.meta_source_warned = True
             self.logger.warning(
@@ -62,19 +73,20 @@ class UnstructuredMDLoader(DocumentLoader):
         if not self.example_sources_shown:
             self.logger.info(f"sample source url: {md_meta['source_url']}")
             self.logger.info(f"sample web url: {md_meta['web_url']}")
-            r = requests.get(md_meta["web_url"])
-            if r.status_code == 404:
+            if requests.get(md_meta["web_url"]).status_code == 404:
                 self.logger.warning(f"Got 404 for web_url {md_meta["web_url"]} ")
-            r = requests.get(md_meta["source_url"])
-            if r.status_code == 404:
+            if requests.get(md_meta["source_url"]).status_code == 404:
                 self.logger.warning(f"Got 404 for source_url {md_meta["source_url"]} ")
+            
             self.example_sources_shown = True
 
         if self.url_check_all:
-            r = requests.get(md_meta["web_url"])
-            if r.status_code == 404:
-                self.logger.warning(f"Got 404 for web_url {md_meta["web_url"]} ")
-
+            if requests.get(md_meta["web_url"]).status_code == 404:
+                self.logger.warning(f"Got 404 for web_url {md_meta["web_url"]} source: {md_meta["source_url"]}")
+                breakpoint
+            if requests.get(md_meta["source_url"]).status_code == 404:
+                self.logger.warning(f"Got 404 for source_url {md_meta["source_url"]} www: {md_meta["web_url"]}")
+                breakpoint
 
         return md_meta
 
@@ -105,7 +117,7 @@ class UnstructuredMDLoader(DocumentLoader):
             )
 
         # Recursively find all .md files
-        markdown_files = list(self.file_path.rglob("*.md"))
+        markdown_files = list(self.file_path.rglob("*.md*"))
         num_files = len(markdown_files)
         self.logger.info(f"Found {num_files} Markdown file(s) in {self.file_path}")
 
