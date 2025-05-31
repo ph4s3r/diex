@@ -17,7 +17,7 @@ documentloader:
   file_path: C:\dev\\sources-to-index\\microsoft-365-docs\\microsoft-365
   # stubs need to end with slash 
   url_source_stub: https://github.com/MicrosoftDocs/microsoft-365-docs/tree/public/microsoft-365/ 
-  url_web_stub: https://learn.microsoft.com/en-us/microsoft-365/
+  url_web_stub: https://learn.microsoft.com/en-us/microsoft-365/blob/public/
   # LLMSherpa SERVER is not working anymore, need to run the backend  locally:
   # docker pull ghcr.io/nlmatics/nlm-ingestor:latest
   # docker run -p 5010:5001 ghcr.io/nlmatics/nlm-ingestor:latest # (this is just for dev)
