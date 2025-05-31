@@ -1,9 +1,13 @@
 param(
-    [string]$RootDir = "C:\dev",
-    [string]$Project = "docs-gitlab-com",
-    [string]$Origin = "https://gitlab.com/gitlab-org/technical-writing/$Project.git",
+    [string]$RootDir = "C:\dev\sources-to-index\",
+    [string]$Project = "microsoft-365-docs",
+    [string]$Origin = "https://github.com/MicrosoftDocs/$Project.git",
+    [string]$Ref = "public",
     [switch]$IncludePDF
 )
+    # gitlab-example
+    # [string]$Project = "docs-gitlab-com",
+    # [string]$Origin = "https://gitlab.com/gitlab-org/technical-writing/$Project.git",
 
 # Confirm parameters if not passed as arguments
 if (-not $PSBoundParameters.ContainsKey('RootDir')) {
@@ -27,6 +31,13 @@ if (-not $PSBoundParameters.ContainsKey('Origin')) {
     }
 }
 
+if (-not $PSBoundParameters.ContainsKey('Origin')) {
+    $confirm = Read-Host "Use default ref '$Ref'? (y/n)"
+    if ($confirm -eq 'n') {
+        $Origin = Read-Host "Enter git origin URL"
+    }
+}
+
 Write-Host "Starting sparse checkout of $Project from $Origin into $RootDir\$Project..."
 
 $originalDir = Get-Location
@@ -35,7 +46,7 @@ try {
     Set-Location $RootDir
     git init $Project
     Set-Location $Project
-    git remote add origin $Origin
+    git remote add origin $Ref
     git config core.sparseCheckout true
     New-Item -ItemType Directory -Force -Path ".git/info" | Out-Null
 
@@ -46,7 +57,7 @@ try {
         "**/*.md" | Set-Content -Path ".git/info/sparse-checkout"
     }
 
-    git pull --depth=1 origin main
+    git pull --depth=1 origin $Ref
 
     $mdCount = (Get-ChildItem -Filter *.md -Recurse | Measure-Object).Count
     $pdfCount = 0
