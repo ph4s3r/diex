@@ -1,6 +1,6 @@
 param(
     [string]$RootDir = "C:\dev\sources-to-index\",
-    [string]$Project = "microsoft-365-docs",
+    [string]$Project = "defender-docs",
     [string]$Origin = "https://github.com/MicrosoftDocs/$Project.git",
     [string]$Ref = "public",
     [switch]$IncludePDF
@@ -8,6 +8,10 @@ param(
     # gitlab-example
     # [string]$Project = "docs-gitlab-com",
     # [string]$Origin = "https://gitlab.com/gitlab-org/technical-writing/$Project.git",
+
+    # [string]$Project = "microsoft-365-docs",
+    # [string]$Origin = "https://github.com/MicrosoftDocs/$Project.git",
+    # [string]$Ref = "public",
 
 # Confirm parameters if not passed as arguments
 if (-not $PSBoundParameters.ContainsKey('RootDir')) {
@@ -46,7 +50,7 @@ try {
     Set-Location $RootDir
     git init $Project
     Set-Location $Project
-    git remote add origin $Ref
+    git remote add origin $Origin
     git config core.sparseCheckout true
     New-Item -ItemType Directory -Force -Path ".git/info" | Out-Null
 
