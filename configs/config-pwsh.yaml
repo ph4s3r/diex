@@ -1,0 +1,53 @@
+file_type: markdown                                             # options: markdown, pdf, txt
+
+pinecone:
+  index_name: voyage1042dev
+  index_host_suffix: 226a147.svc.aped-4627-b74a.pinecone.io # need to be something like 226a147.svc.aped-4627-b74a.pinecone.io
+  namespace: ms-docs # namespace is created automatically if not exists
+
+documentloader:
+
+  ## local path EXAMPLES
+  # file_path: "/home/peet/dev/azure-docs-md/"                     # nix
+  # file_path: "files/"                                            # relative
+
+  url_check_all: True
+
+  ## WEB & MD SOURCE URL building
+  ## the build_md_source_and_web_urls function builds the URLs, from the below data
+  ## you must assure that the file_path and the stub URL is at the same distance from a file
+  ## otherwise the DocumentLoader logger will log the sample meta source:
+  file_path: C:\dev\sources-to-index\powershell-docs\reference
+  # stubs need to end with slash 
+  url_source_stub: https://github.com/MicrosoftDocs/PowerShell-Docs/tree/main/reference/
+  url_web_stub: https://learn.microsoft.com/en-us/powershell/
+  # LLMSherpa SERVER is not working anymore, need to run the backend  locally:
+  # docker pull ghcr.io/nlmatics/nlm-ingestor:latest
+  # docker run -p 5010:5001 ghcr.io/nlmatics/nlm-ingestor:latest # (this is just for dev)
+  api_url: http://localhost:5010/api/parseDocument?renderFormat=all
+  api_url_ocr: http://localhost:5010/api/parseDocument?renderFormat=all&applyOcr=yes
+
+metadata:
+  # the format of microsoft docs should be like the github repos e.g. "entra-docs" etc...
+  # index date is always "mm/dd/yyyy" same as the ms.date in ms-docs
+  # source formats are pdf, markdown, html etc...
+  main_category: "ms-docs"
+  sub_category: "powershell-docs"
+  index_date: "05/31/2025"
+  requestor: "peet"
+  source_format: "markdown"
+  www: "https://learn.microsoft.com/en-us/powershell/"
+
+
+splitter:
+  tokensplitter:
+    max_token_seq_len: 1024
+    token_overlap: 256
+
+
+embedder:
+  voyage:
+    output_dimension: 1024
+    output_dtype: float
+    model: voyage-3-large
+    batch_size: 128
